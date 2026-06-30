@@ -138,6 +138,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link active" href="./analisis.html" aria-current="page"> 
 <span class="menu-text">Analisis Data</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./skripsi.html"> 
+<span class="menu-text">Skripsi</span></a>
+  </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item dropdown ">
@@ -265,11 +269,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">kemiskinan</td>
-<td style="text-align: right;">10.95</td>
-<td style="text-align: right;">10.64</td>
-<td style="text-align: right;">3.88</td>
-<td style="text-align: right;">4.65</td>
-<td style="text-align: right;">24.58</td>
+<td style="text-align: right;">10.37</td>
+<td style="text-align: right;">10.61</td>
+<td style="text-align: right;">3.23</td>
+<td style="text-align: right;">4.58</td>
+<td style="text-align: right;">16.50</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">pdrb_kapita</td>
@@ -309,13 +313,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output cell-output-stdout">
 <pre><code>       kemiskinan  pdrb_kapita  inflasi    ipm
 count       35.00        35.00    35.00  35.00
-mean        10.95        41.88     2.69  79.39
-std          3.88         5.66     0.46   1.92
-min          4.65        31.63     1.84  76.20
-25%          8.24        38.80     2.35  77.87
-50%         10.64        41.05     2.67  79.17
-75%         12.50        46.02     3.10  80.84
-max         24.58        56.23     3.52  85.10</code></pre>
+mean        10.37        41.88     2.69  79.39
+std          3.23         5.66     0.46   1.92
+min          4.58        31.63     1.84  76.20
+25%          7.95        38.80     2.35  77.87
+50%         10.61        41.05     2.67  79.17
+75%         11.91        46.02     3.10  80.84
+max         16.50        56.23     3.52  85.10</code></pre>
 </div>
 </div>
 </div>
@@ -394,35 +398,35 @@ max         24.58        56.23     3.52  85.10</code></pre>
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">Konstanta</td>
-<td style="text-align: right;">39.795</td>
-<td style="text-align: right;">0.002</td>
+<td style="text-align: right;">98.355</td>
+<td style="text-align: right;">0.000</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">PDRB per kapita</td>
-<td style="text-align: right;">0.042</td>
-<td style="text-align: right;">0.471</td>
+<td style="text-align: right;">-0.123</td>
+<td style="text-align: right;">0.001</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Inflasi</td>
-<td style="text-align: right;">0.004</td>
-<td style="text-align: right;">0.983</td>
+<td style="text-align: right;">0.198</td>
+<td style="text-align: right;">0.112</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">IPM</td>
-<td style="text-align: right;">-0.408</td>
-<td style="text-align: right;">0.018</td>
+<td style="text-align: right;">-1.077</td>
+<td style="text-align: right;">0.000</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Pengangguran</td>
-<td style="text-align: right;">0.323</td>
-<td style="text-align: right;">0.076</td>
+<td style="text-align: right;">0.235</td>
+<td style="text-align: right;">0.031</td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"R-squared = %.3f"</span>, <span class="fu">summary</span>(model)<span class="sc">$</span>r.squared))</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>R-squared = 0.055</code></pre>
+<pre><code>R-squared = 0.533</code></pre>
 </div>
 </div>
 </div>
@@ -435,15 +439,15 @@ max         24.58        56.23     3.52  85.10</code></pre>
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(koef)</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>                 Koefisien  p-value
-Konstanta           39.795    0.002
-PDRB per kapita      0.042    0.471
-Inflasi              0.004    0.983
-IPM                 -0.408    0.018
-Pengangguran         0.323    0.076</code></pre>
+Konstanta           98.355    0.000
+PDRB per kapita     -0.123    0.001
+Inflasi              0.198    0.112
+IPM                 -1.077    0.000
+Pengangguran         0.235    0.031</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"R-squared = </span><span class="sc">{</span>model<span class="sc">.</span>rsquared<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>R-squared = 0.055</code></pre>
+<pre><code>R-squared = 0.533</code></pre>
 </div>
 </div>
 </div>
@@ -514,7 +518,7 @@ Pengangguran         0.323    0.076</code></pre>
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>mt <span class="ot">&lt;-</span> <span class="fu">moran.test</span>(peta<span class="sc">$</span>kemiskinan, w)</span>
 <span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"Moran's I = %.3f (p = %.4f)"</span>, mt<span class="sc">$</span>estimate[<span class="dv">1</span>], mt<span class="sc">$</span>p.value))</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Moran's I = 0.106 (p = 0.1194)</code></pre>
+<pre><code>Moran's I = 0.294 (p = 0.0038)</code></pre>
 </div>
 </div>
 </div>
@@ -526,7 +530,7 @@ Pengangguran         0.323    0.076</code></pre>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>mi <span class="op">=</span> Moran(pmap[<span class="st">"kemiskinan"</span>].values, w)</span>
 <span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Moran's I = </span><span class="sc">{</span>mi<span class="sc">.</span>I<span class="sc">:.3f}</span><span class="ss"> (p = </span><span class="sc">{</span>mi<span class="sc">.</span>p_sim<span class="sc">:.4f}</span><span class="ss">)"</span>)</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Moran's I = 0.106 (p = 0.1210)</code></pre>
+<pre><code>Moran's I = 0.294 (p = 0.0110)</code></pre>
 </div>
 </div>
 </div>
