@@ -39,7 +39,7 @@
     "href": "en/skripsi.html#downloads-templates",
     "title": "A Thesis (Skripsi) with Quarto",
     "section": "Downloads & templates",
-    "text": "Downloads & templates\n\n📄 Download the example thesis (PDF) — 35 pages, rendered from the template.\n📦 Thesis templates (R & Python) + defense slides — in the book’s repo: https://github.com/firmanhadi21/thesis-with-quarto\n📘 Full book “Quarto untuk Skripsi” (chapter-by-chapter guide; Indonesian): https://firmanhadi21.github.io/thesis-with-quarto/"
+    "text": "Downloads & templates\n\n📄 Download the example thesis (PDF) — 35 pages, rendered from the template.\n📦 Download a ready-to-render template (ZIP): R template · Python template — complete with bab/, data/, tex/preamble.tex, referensi.bib, and defense slides.\n🔎 Browse / clone the template source in this (public) workshop repo: https://github.com/firmanhadi21/quarto-workshop/tree/main/templates\n📘 Full book “Quarto untuk Skripsi” (chapter-by-chapter guide; Indonesian): https://firmanhadi21.github.io/thesis-with-quarto/\n\n\n\n\n\n\n\nNoteUsing the ZIP\n\n\n\n\nDownload & unzip. 2. Open the folder in RStudio (click *.Rproj). 3. Replace data/ and write each chapter in bab/. 4. Hit Render → thesis PDF."
   },
   {
     "objectID": "en/hands-on.html",
@@ -137,7 +137,7 @@
     "href": "skripsi.html#unduh-templat",
     "title": "Skripsi dengan Quarto",
     "section": "Unduh & templat",
-    "text": "Unduh & templat\n\n📄 Unduh contoh skripsi (PDF) — 35 halaman, hasil render templat.\n📦 Templat skripsi (R & Python) + slide sidang — di repositori buku: https://github.com/firmanhadi21/thesis-with-quarto\n📘 Buku lengkap “Quarto untuk Skripsi” (panduan bab demi bab): https://firmanhadi21.github.io/thesis-with-quarto/"
+    "text": "Unduh & templat\n\n📄 Unduh contoh skripsi (PDF) — 35 halaman, hasil render templat.\n📦 Unduh templat siap render (ZIP): Templat R · Templat Python — sudah lengkap dengan bab/, data/, tex/preamble.tex, referensi.bib, dan slide sidang.\n🔎 Lihat / kloning sumber templat di repo workshop (publik): https://github.com/firmanhadi21/quarto-workshop/tree/main/templates\n📘 Buku lengkap “Quarto untuk Skripsi” (panduan bab demi bab): https://firmanhadi21.github.io/thesis-with-quarto/\n\n\n\n\n\n\n\nCatatanCara memakai ZIP\n\n\n\n\nUnduh & ekstrak. 2. Buka folder di RStudio (klik *.Rproj). 3. Ganti isi data/ & tulis tiap bab di bab/. 4. Tekan Render → PDF skripsi."
   },
   {
     "objectID": "hands-on.html",
