@@ -73,7 +73,17 @@ Margins, font (e.g. **Times New Roman 12pt**), 1.5 line spacing, and numbering l
 
 - 📄 **[Download the example thesis (PDF)](../skripsi/contoh-skripsi.pdf)** — 35 pages,
   rendered from the template.
-- 📦 **Thesis templates (R & Python)** + defense slides — in the book's repo:
-  <https://github.com/firmanhadi21/thesis-with-quarto>
+- 📦 **Download a ready-to-render template (ZIP):**
+  [**R** template](../skripsi/template-skripsi-r.zip) ·
+  [**Python** template](../skripsi/template-skripsi-python.zip)
+  — complete with `bab/`, `data/`, `tex/preamble.tex`, `referensi.bib`, and **defense slides**.
+- 🔎 **Browse / clone the template source** in this (public) workshop repo:
+  <https://github.com/firmanhadi21/quarto-workshop/tree/main/templates>
 - 📘 **Full book "Quarto untuk Skripsi"** (chapter-by-chapter guide; Indonesian):
   <https://firmanhadi21.github.io/thesis-with-quarto/>
+
+::: {.callout-note}
+## Using the ZIP
+1. Download & unzip. 2. Open the folder in **RStudio** (click `*.Rproj`). 3. Replace
+`data/` and write each chapter in `bab/`. 4. Hit **Render** → thesis PDF.
+:::

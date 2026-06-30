@@ -73,7 +73,18 @@ di `tex/preamble.tex` dan `_quarto.yml` — sesuaikan sekali, berlaku untuk selu
 
 - 📄 **[Unduh contoh skripsi (PDF)](skripsi/contoh-skripsi.pdf)** — 35 halaman, hasil
   render templat.
-- 📦 **Templat skripsi (R & Python)** + slide sidang — di repositori buku:
-  <https://github.com/firmanhadi21/thesis-with-quarto>
+- 📦 **Unduh templat siap render (ZIP):**
+  [Templat **R**](skripsi/template-skripsi-r.zip) ·
+  [Templat **Python**](skripsi/template-skripsi-python.zip)
+  — sudah lengkap dengan `bab/`, `data/`, `tex/preamble.tex`, `referensi.bib`, dan
+  **slide sidang**.
+- 🔎 **Lihat / kloning sumber templat** di repo workshop (publik):
+  <https://github.com/firmanhadi21/quarto-workshop/tree/main/templates>
 - 📘 **Buku lengkap "Quarto untuk Skripsi"** (panduan bab demi bab):
   <https://firmanhadi21.github.io/thesis-with-quarto/>
+
+::: {.callout-note}
+## Cara memakai ZIP
+1. Unduh & ekstrak. 2. Buka folder di **RStudio** (klik `*.Rproj`). 3. Ganti isi `data/`
+& tulis tiap bab di `bab/`. 4. Tekan **Render** → PDF skripsi.
+:::

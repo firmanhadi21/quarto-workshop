@@ -1,0 +1,66 @@
+project:
+  type: book
+  output-dir: _book
+  execute-dir: project
+
+# ============================================================================
+#  DATA DIRI (nama, NIM, judul, dosen) diedit di berkas:  tex/frontmatter.tex
+#  pada blok "DATA DIRI" di bagian paling atas berkas tersebut.
+# ============================================================================
+
+book:
+  title: "PENGARUH PDRB DAN INFLASI TERHADAP TINGKAT KEMISKINAN DI PROVINSI JAWA TENGAH"
+  author: "Nama Lengkap Mahasiswa"
+  chapters:
+    - index.qmd
+    - bab/01-pendahuluan.qmd
+    - bab/02-tinjauan-pustaka.qmd
+    - bab/03-metode-penelitian.qmd
+    - bab/04-hasil-pembahasan.qmd
+    - bab/05-penutup.qmd
+  appendices:
+    - lampiran.qmd
+
+bibliography: referensi.bib
+csl: https://www.zotero.org/styles/apa
+
+crossref:
+  chapters: true
+
+lang: id
+language:
+  crossref-eq-title: "Persamaan"
+
+format:
+  pdf:
+    documentclass: scrreprt
+    papersize: a4
+    fontsize: 12pt
+    # Times New Roman (sudah tersedia di macOS & Windows). Jika di sistem lain
+    # tidak ada, ganti ke "TeX Gyre Termes" (tiruan Times bawaan TeX Live, identik).
+    mainfont: "Times New Roman"
+    linestretch: 1.5
+    geometry:
+      - top=3cm
+      - left=4cm
+      - right=3cm
+      - bottom=3cm
+    number-depth: 3
+    toc: false
+    lof: false
+    lot: false
+    include-in-header: tex/preamble.tex
+    include-before-body: tex/frontmatter.tex
+    cite-method: citeproc
+
+execute:
+  echo: false
+  warning: false
+  message: false
+  # freeze: false (bawaan) — selalu jalankan ulang kode saat render, sehingga
+  # perubahan DATA (mis. data/*.csv) langsung tercermin di hasil. Jangan pakai
+  # "freeze: auto" di templat: freeze hanya mendeteksi perubahan berkas .qmd,
+  # bukan berkas data, sehingga hasil bisa basi setelah Anda mengganti data.
+  freeze: false
+
+jupyter: python3

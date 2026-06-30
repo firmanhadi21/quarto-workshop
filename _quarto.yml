@@ -14,6 +14,8 @@ project:
     - slides/slides-id.pdf
     - slides/slides-en.pdf
     - skripsi/contoh-skripsi.pdf
+    - skripsi/template-skripsi-r.zip
+    - skripsi/template-skripsi-python.zip
     - data/**
 
 website:

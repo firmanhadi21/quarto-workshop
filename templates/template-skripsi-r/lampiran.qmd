@@ -1,0 +1,26 @@
+# Lampiran {.unnumbered}
+
+## Lampiran 1: Data Penelitian (Cuplikan)
+
+Berikut adalah sepuluh baris pertama data hasil penggabungan dua sumber: data utama
+(`data/data_kemiskinan_jateng.csv`) dan data pendukung
+(`data/data_pendukung_jateng.json`), digabung melalui `kode_wilayah` dan `tahun`.
+
+```{r}
+#| label: tbl-lampiran-data
+#| tbl-cap: "Cuplikan data penelitian setelah penggabungan (10 baris pertama)"
+library(jsonlite)
+utama <- read.csv("data/data_kemiskinan_jateng.csv")
+pendukung <- fromJSON("data/data_pendukung_jateng.json")
+df <- merge(utama, pendukung, by = c("kode_wilayah", "tahun"), all.x = TRUE)
+knitr::kable(head(df, 10))
+```
+
+## Lampiran 2: Hasil Lengkap Regresi
+
+```{r}
+#| echo: false
+model <- lm(kemiskinan ~ pdrb_kapita + inflasi + ipm + pengangguran +
+              akses_sanitasi + tpak, data = df)
+summary(model)
+```

@@ -1,0 +1,11 @@
+---
+echo: false
+---
+
+<!--
+  Berkas index.qmd ini sengaja dibiarkan (hampir) kosong.
+  Seluruh BAGIAN AWAL skripsi (sampul, persetujuan, pengesahan, pernyataan
+  orisinalitas, abstrak, kata pengantar, daftar isi/tabel/gambar) diatur secara
+  otomatis melalui berkas: tex/frontmatter.tex
+  Mulai menulis isi skripsi di berkas-berkas dalam folder bab/.
+-->

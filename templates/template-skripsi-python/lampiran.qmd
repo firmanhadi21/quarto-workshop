@@ -1,0 +1,28 @@
+# Lampiran {.unnumbered}
+
+## Lampiran 1: Data Penelitian (Cuplikan)
+
+Berikut adalah sepuluh baris pertama data hasil penggabungan dua sumber: data utama
+(`data/data_kemiskinan_jateng.csv`) dan data pendukung
+(`data/data_pendukung_jateng.json`), digabung melalui `kode_wilayah` dan `tahun`.
+
+```{python}
+#| label: tbl-lampiran-data
+#| tbl-cap: "Cuplikan data penelitian setelah penggabungan (10 baris pertama)"
+import pandas as pd
+from IPython.display import Markdown
+utama = pd.read_csv("data/data_kemiskinan_jateng.csv")
+pendukung = pd.read_json("data/data_pendukung_jateng.json")
+df = utama.merge(pendukung, on=["kode_wilayah", "tahun"], how="left")
+Markdown(df.head(10).to_markdown(index=False))
+```
+
+## Lampiran 2: Hasil Lengkap Regresi
+
+```{python}
+#| echo: false
+import statsmodels.formula.api as smf
+model = smf.ols("kemiskinan ~ pdrb_kapita + inflasi + ipm + pengangguran "
+                "+ akses_sanitasi + tpak", data=df).fit()
+print(model.summary())
+```

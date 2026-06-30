@@ -1,0 +1,147 @@
+# METODE PENELITIAN
+
+## Variabel Penelitian dan Definisi Operasional
+
+Penelitian ini menggunakan satu variabel terikat, dua variabel bebas utama (PDRB per
+kapita dan inflasi), serta empat variabel kontrol (IPM, pengangguran, akses sanitasi,
+dan TPAK). Definisi operasional masing-masing variabel disajikan pada @tbl-definisi.
+
+```{r}
+#| label: tbl-definisi
+#| tbl-cap: "Definisi operasional variabel penelitian"
+defop <- data.frame(
+  Variabel = c("Kemiskinan (Y)", "PDRB per kapita (X1)", "Inflasi (X2)",
+               "IPM (X3, kontrol)", "Pengangguran (X4, kontrol)",
+               "Akses sanitasi (X5, kontrol)", "TPAK (X6, kontrol)"),
+  Definisi = c(
+    "Persentase penduduk miskin terhadap total penduduk",
+    "PDRB atas dasar harga konstan dibagi jumlah penduduk (juta rupiah)",
+    "Laju kenaikan harga barang dan jasa secara umum (persen)",
+    "Indeks Pembangunan Manusia",
+    "Tingkat Pengangguran Terbuka (persen)",
+    "Persentase rumah tangga dengan akses sanitasi layak",
+    "Tingkat Partisipasi Angkatan Kerja (persen)"),
+  Satuan = c("Persen", "Juta Rp", "Persen", "Indeks", "Persen", "Persen", "Persen"),
+  Sumber = c("data utama", "data utama", "data utama", "data utama",
+             "data utama", "data pendukung", "data pendukung"),
+  check.names = FALSE
+)
+knitr::kable(defop)
+```
+
+## Jenis dan Sumber Data
+
+Penelitian ini menggunakan data sekunder berbentuk **data panel**, yaitu gabungan
+data lintas wilayah (*cross section*) sebanyak 35 kabupaten/kota di Provinsi Jawa
+Tengah dan deret waktu (*time series*) selama periode 2019--2023. Dengan demikian,
+total observasi adalah $35 \times 5 = 175$ observasi. Data bersumber dari publikasi
+Badan Pusat Statistik Provinsi Jawa Tengah [@bps2024].
+
+Data dihimpun dari **dua berkas dengan format berbeda** yang lazim ditemui dalam
+penelitian nyata:
+
+- `data_kemiskinan_jateng.csv` — data utama (kemiskinan, PDRB, inflasi, pengangguran,
+  IPM).
+- `data_pendukung_jateng.json` — data pendukung (akses sanitasi dan TPAK), berformat
+  JSON.
+
+Kedua berkas memiliki kolom kunci `kode_wilayah` (kode kabupaten/kota BPS) dan `tahun`
+yang dipakai untuk **menggabungkan** keduanya menjadi satu tabel analisis.
+
+```{r}
+#| label: gabung-data
+library(jsonlite)
+
+utama <- read.csv("data/data_kemiskinan_jateng.csv")          # CSV
+pendukung <- fromJSON("data/data_pendukung_jateng.json")      # JSON
+
+# Gabungkan berdasarkan kunci unik: kode_wilayah + tahun
+df <- merge(utama, pendukung, by = c("kode_wilayah", "tahun"), all.x = TRUE)
+cat(sprintf("Jumlah observasi setelah digabung : %d\n", nrow(df)))
+cat(sprintf("Jumlah kolom                      : %d\n", ncol(df)))
+cat("Variabel tambahan dari data JSON  : akses_sanitasi, tpak\n")
+```
+
+::: {.callout-note appearance="simple"}
+Pada templat ini, kedua berkas berisi **data tiruan** untuk keperluan demonstrasi.
+Namun, baseline tingkat kemiskinan tiap daerah telah **dikalibrasi** agar pola
+antarwilayahnya mendekati kondisi riil (mengacu pada angka BPS Maret 2023 — mis.
+Kebumen, Wonosobo, dan Brebes tertinggi; Kota Semarang terendah), sehingga peta dan
+peringkat daerahnya realistis. Meski begitu, angka detailnya tetap data latihan —
+gantilah dengan data asli BPS saat menyusun skripsi sungguhan. Teknik penggabungan
+(`merge`) memakai **kode wilayah**, bukan nama, agar tidak gagal akibat perbedaan
+penulisan nama daerah.
+:::
+
+## Populasi dan Sampel
+
+Populasi penelitian ini adalah seluruh kabupaten/kota di Provinsi Jawa Tengah.
+Pengambilan sampel dilakukan dengan teknik *sampling jenuh* (sensus), yaitu seluruh
+35 kabupaten/kota dijadikan sampel penelitian. Sebaran wilayah penelitian — terdiri
+atas 29 kabupaten dan 6 kota — ditampilkan pada @fig-wilayah.
+
+```{r}
+#| label: fig-wilayah
+#| fig-cap: "Wilayah penelitian: 35 kabupaten/kota di Provinsi Jawa Tengah"
+#| fig-width: 7
+#| fig-height: 4.5
+library(sf)
+library(ggplot2)
+library(maptiles)
+library(tidyterra)
+
+# Batas wilayah dari GADM (https://gadm.org), level 2 (kabupaten/kota).
+# Proyeksikan ke Web Mercator (EPSG:3857) agar selaras dengan ubin OSM.
+geo <- st_transform(st_read("data/jateng.geojson", quiet = TRUE), 3857)
+# Tandai daerah berstatus kota dengan warna berbeda
+geo$status <- ifelse(geo$TYPE_2 == "Kota", "Kota", "Kabupaten")
+
+# Unduh peta latar OpenStreetMap (memerlukan koneksi internet saat render)
+latar <- get_tiles(geo, provider = "OpenStreetMap", zoom = 9, crop = TRUE)
+
+ggplot() +
+  geom_spatraster_rgb(data = latar) +
+  geom_sf(data = geo, aes(fill = status), color = "#7a5c00",
+          linewidth = 0.3, alpha = 0.6) +
+  scale_fill_manual(values = c(Kabupaten = "#fec44f", Kota = "#b03a2e"),
+                    name = NULL) +
+  theme_void()
+```
+
+Pada @fig-wilayah, daerah berwarna gelap menunjukkan wilayah berstatus kota, sedangkan
+daerah berwarna terang adalah kabupaten.
+
+## Metode Analisis
+
+Penelitian ini menggunakan metode **analisis regresi linear berganda** untuk menguji
+pengaruh variabel bebas terhadap variabel terikat. Model regresi yang digunakan
+dirumuskan pada @eq-model.
+
+$$
+\begin{aligned}
+KMSKN_{it} = {} & \beta_0 + \beta_1 PDRB_{it} + \beta_2 INF_{it} + \beta_3 IPM_{it} \\
+& + \beta_4 PGGR_{it} + \beta_5 SANIT_{it} + \beta_6 TPAK_{it} + \varepsilon_{it}
+\end{aligned}
+$$ {#eq-model}
+
+dengan $KMSKN$ adalah tingkat kemiskinan, $PDRB$ adalah PDRB per kapita, $INF$ adalah
+inflasi, $IPM$ adalah Indeks Pembangunan Manusia, $PGGR$ adalah tingkat pengangguran,
+$SANIT$ adalah akses sanitasi, $TPAK$ adalah tingkat partisipasi angkatan kerja,
+$\beta_0$ adalah konstanta, $\beta_1$ sampai $\beta_6$ adalah koefisien regresi,
+$\varepsilon$ adalah error, $i$ menunjukkan wilayah, dan $t$ menunjukkan tahun.
+
+### Uji Asumsi Klasik
+
+Agar estimasi regresi bersifat *Best Linear Unbiased Estimator* (BLUE), dilakukan uji
+asumsi klasik yang meliputi uji normalitas (untuk memastikan residual berdistribusi
+normal), uji multikolinearitas (untuk memastikan tidak ada korelasi tinggi
+antarvariabel bebas, dengan melihat nilai *Variance Inflation Factor*/VIF), serta uji
+heteroskedastisitas (untuk memastikan ragam residual konstan) [@gujarati2009].
+
+### Uji Hipotesis
+
+Pengujian hipotesis dilakukan melalui: (1) **uji t** untuk menguji pengaruh masing-
+masing variabel bebas secara parsial; (2) **uji F** untuk menguji pengaruh seluruh
+variabel bebas secara simultan; dan (3) **koefisien determinasi** ($R^2$) untuk
+mengukur proporsi keragaman variabel terikat yang dapat dijelaskan oleh model. Tingkat
+signifikansi yang digunakan adalah $\alpha = 0{,}05$.

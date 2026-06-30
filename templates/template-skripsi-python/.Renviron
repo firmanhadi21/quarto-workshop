@@ -1,0 +1,7 @@
+# RStudio/Quarto: render this project with the quarto-skripsi conda env.
+# Python (jupyter) cells + reticulate (knitr chapters) use this interpreter,
+# and PROJ/GDAL data dirs let geopandas/contextily work without conda activate.
+QUARTO_PYTHON=/Users/firmanhadi/miniforge3/envs/quarto-skripsi/bin/python
+RETICULATE_PYTHON=/Users/firmanhadi/miniforge3/envs/quarto-skripsi/bin/python
+PROJ_DATA=/Users/firmanhadi/miniforge3/envs/quarto-skripsi/share/proj
+GDAL_DATA=/Users/firmanhadi/miniforge3/envs/quarto-skripsi/share/gdal

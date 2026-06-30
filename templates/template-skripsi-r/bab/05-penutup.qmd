@@ -1,0 +1,38 @@
+# PENUTUP
+
+## Kesimpulan
+
+Berdasarkan hasil analisis dan pembahasan, penelitian ini menyimpulkan beberapa hal
+sebagai berikut:
+
+1. PDRB per kapita berpengaruh **negatif dan signifikan** terhadap tingkat kemiskinan
+   di Provinsi Jawa Tengah. Semakin tinggi PDRB per kapita suatu wilayah, semakin
+   rendah tingkat kemiskinannya.
+2. Inflasi berpengaruh **positif tetapi tidak signifikan** terhadap tingkat
+   kemiskinan. Arah pengaruh sesuai teori, namun pengaruhnya belum cukup kuat secara
+   statistik pada periode penelitian.
+3. Secara simultan, PDRB per kapita dan inflasi—bersama variabel kontrol IPM,
+   pengangguran, akses sanitasi, dan TPAK—berpengaruh **signifikan** terhadap tingkat
+   kemiskinan.
+4. Di antara variabel kontrol, IPM dan **akses sanitasi** berpengaruh negatif dan
+   signifikan, menegaskan pentingnya kualitas pembangunan manusia dan pemenuhan
+   kebutuhan dasar dalam menurunkan kemiskinan.
+
+## Keterbatasan Penelitian
+
+Penelitian ini memiliki beberapa keterbatasan. Pertama, periode penelitian relatif
+pendek (lima tahun). Kedua, jumlah variabel yang digunakan terbatas, sehingga masih
+terdapat faktor lain yang belum tercakup dalam model. Ketiga, metode yang digunakan
+adalah regresi linear berganda; penelitian lanjutan dapat mempertimbangkan model data
+panel (*fixed effect* atau *random effect*) untuk menangkap heterogenitas antarwilayah.
+
+## Saran
+
+Berdasarkan kesimpulan tersebut, beberapa saran yang dapat diberikan adalah:
+
+1. Pemerintah daerah perlu mendorong pertumbuhan ekonomi yang inklusif agar
+   peningkatan PDRB benar-benar dirasakan oleh kelompok masyarakat miskin.
+2. Peningkatan kualitas pembangunan manusia (IPM) melalui pendidikan dan kesehatan
+   perlu terus diperkuat sebagai strategi penanggulangan kemiskinan jangka panjang.
+3. Penelitian selanjutnya disarankan memperpanjang periode pengamatan, menambah
+   variabel penjelas, dan menggunakan pendekatan regresi data panel.

@@ -1,0 +1,5 @@
+Letakkan logo universitas di folder ini dengan nama: logo-undip.png
+
+Halaman sampul (tex/frontmatter.tex) akan memuatnya otomatis.
+Jika berkas belum ada, sampul menampilkan kotak "[ Logo Universitas ]" sebagai
+penanda sementara.

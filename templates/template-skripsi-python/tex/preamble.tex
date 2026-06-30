@@ -1,0 +1,47 @@
+% =====================================================================
+%  preamble.tex — pengaturan tata letak skripsi (format FEB UNDIP)
+%  Anda jarang perlu mengubah berkas ini. Edit data diri di frontmatter.tex
+% =====================================================================
+
+\usepackage{setspace}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{caption}
+
+% --- Penomoran bab gaya Indonesia: "BAB I", "BAB II", ... -------------
+\renewcommand{\thechapter}{\Roman{chapter}}
+\renewcommand{\chaptername}{BAB}
+
+% KOMA-Script: tampilkan "BAB I" lalu judul bab di baris berikutnya,
+% rata tengah, huruf kapital.
+\renewcommand*{\raggedchapter}{\centering}
+% Semua judul (bab, sub-bab) & entri daftar isi pakai huruf serif (Times),
+% bukan sans-serif bawaan KOMA-Script.
+\addtokomafont{disposition}{\rmfamily}
+\setkomafont{chapter}{\normalfont\bfseries\large\MakeUppercase}
+\renewcommand*{\chapterformat}{\chapapp~\thechapter\\[0.3em]}
+\renewcommand*{\chapterlinesformat}[3]{#2#3}
+
+% --- Nomor tabel & gambar mengikuti nomor bab (arabik): 4.1, 4.2 ------
+\renewcommand{\thetable}{\arabic{chapter}.\arabic{table}}
+\renewcommand{\thefigure}{\arabic{chapter}.\arabic{figure}}
+\renewcommand{\theequation}{\arabic{chapter}.\arabic{equation}}
+
+% --- Header / footer --------------------------------------------------
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[R]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+
+% --- Keterangan tabel/gambar ------------------------------------------
+\captionsetup{font=normalsize, labelsep=space}
+
+% --- Matikan halaman judul bawaan Quarto (kita pakai sampul sendiri) ---
+\AtBeginDocument{\let\maketitle\relax}
+
+% Spasi 1,5 sudah diatur lewat linestretch di _quarto.yml.
+% Indentasi awal paragraf:
+\setlength{\parindent}{1.27cm}

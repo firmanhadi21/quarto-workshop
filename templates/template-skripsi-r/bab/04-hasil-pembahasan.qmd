@@ -1,0 +1,209 @@
+---
+
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+# HASIL DAN PEMBAHASAN
+
+```{r}
+#| label: setup-analisis
+library(jsonlite)
+library(tseries)    # uji Jarque-Bera
+library(lmtest)     # uji Breusch-Pagan
+library(car)        # VIF
+library(sf)         # data spasial
+library(ggplot2)
+library(maptiles)   # unduh ubin peta OSM
+library(tidyterra)  # tampilkan ubin sebagai latar peta
+
+# Baca dua sumber data lalu gabungkan berdasarkan kode_wilayah + tahun
+utama <- read.csv("data/data_kemiskinan_jateng.csv")
+pendukung <- fromJSON("data/data_pendukung_jateng.json")
+df <- merge(utama, pendukung, by = c("kode_wilayah", "tahun"), all.x = TRUE)
+
+# Estimasi model regresi linear berganda
+model <- lm(kemiskinan ~ pdrb_kapita + inflasi + ipm + pengangguran +
+              akses_sanitasi + tpak, data = df)
+
+f <- function(x, n = 3) gsub(".", ",", sprintf(paste0("%.", n, "f"), x), fixed = TRUE)
+
+# Pembanding otomatis terhadap taraf nyata 0,05 (agar narasi selalu sesuai angka)
+banding <- function(p, alpha = 0.05) if (p < alpha) "lebih kecil" else "lebih besar"
+sig <- function(p, alpha = 0.05) if (p < alpha) "signifikan" else "tidak signifikan"
+
+# Angka desimal aman untuk mode matematika LaTeX (koma terlindungi: {,})
+fm <- function(x, n = 3) gsub(".", "{,}", sprintf(paste0("%.", n, "f"), x), fixed = TRUE)
+
+# Suku persamaan dengan tanda + / - otomatis
+suku <- function(coef, nama, n = 3) {
+  tanda <- if (coef < 0) "-" else "+"
+  sprintf(" %s %s\\,%s", tanda, fm(abs(coef), n), nama)
+}
+```
+
+## Deskripsi Objek Penelitian
+
+Objek penelitian ini adalah 35 kabupaten/kota di Provinsi Jawa Tengah selama periode 2019--2023. Statistik deskriptif variabel penelitian disajikan pada @tbl-deskriptif.
+
+```{r}
+#| label: tbl-deskriptif
+#| tbl-cap: "Statistik deskriptif variabel penelitian"
+kol <- c("kemiskinan", "pdrb_kapita", "inflasi", "pengangguran", "ipm",
+         "akses_sanitasi", "tpak")
+tab <- t(sapply(df[kol], function(x) c(mean(x), sd(x), min(x), max(x))))
+tab <- round(tab, 2)
+colnames(tab) <- c("Rata-rata", "Std. Deviasi", "Minimum", "Maksimum")
+rownames(tab) <- c("Kemiskinan (%)", "PDRB/kapita (juta Rp)", "Inflasi (%)",
+                   "Pengangguran (%)", "IPM", "Akses sanitasi (%)", "TPAK (%)")
+knitr::kable(tab)
+```
+
+Berdasarkan @tbl-deskriptif, rata-rata tingkat kemiskinan sebesar `r f(mean(df$kemiskinan), 2)` persen dengan rentang yang cukup lebar, menunjukkan adanya disparitas antarwilayah di Jawa Tengah. Disparitas spasial ini tampak lebih jelas pada peta sebaran tingkat kemiskinan menurut kabupaten/kota tahun 2023 yang disajikan pada @fig-peta-kemiskinan.
+
+```{r}
+#| label: fig-peta-kemiskinan
+#| fig-cap: "Sebaran tingkat kemiskinan menurut kabupaten/kota di Jawa Tengah, 2023"
+#| fig-width: 7.5
+#| fig-height: 4.8
+# Gabungkan data kemiskinan dengan batas wilayah GADM (https://gadm.org)
+geo <- st_transform(st_read("data/jateng.geojson", quiet = TRUE), 3857)  # Web Mercator
+peta <- merge(geo, df[df$tahun == 2023, ], by = "wilayah", all.x = TRUE)
+
+# Peta latar OpenStreetMap (memerlukan koneksi internet saat render)
+latar <- get_tiles(peta, provider = "OpenStreetMap", zoom = 9, crop = TRUE)
+
+ggplot() +
+  geom_spatraster_rgb(data = latar) +
+  geom_sf(data = peta, aes(fill = kemiskinan), color = "white",
+          linewidth = 0.1, alpha = 0.8) +
+  scale_fill_distiller(palette = "OrRd", direction = 1,
+                       name = "Tingkat\nkemiskinan (%)") +
+  theme_void()
+```
+
+Peta pada @fig-peta-kemiskinan memperlihatkan bahwa wilayah dengan tingkat kemiskinan tinggi (warna lebih gelap) cenderung mengelompok di beberapa kabupaten, sementara daerah perkotaan umumnya memiliki tingkat kemiskinan yang lebih rendah.
+
+## Hasil Uji Asumsi Klasik
+
+### Uji Normalitas
+
+Uji normalitas dilakukan terhadap residual model menggunakan uji Jarque-Bera. Hasil pengujian menghasilkan nilai probabilitas sebesar `r f(jarque.bera.test(residuals(model))$p.value, 3)`.
+
+```{r}
+jb <- jarque.bera.test(residuals(model))
+jb_p <- jb$p.value
+```
+
+Karena nilai probabilitas (`r f(jb_p,3)`) `r banding(jb_p)` dari 0,05, residual dinyatakan `r if (jb_p > 0.05) "berdistribusi normal" else "tidak berdistribusi normal"` sehingga asumsi normalitas `r if (jb_p > 0.05) "terpenuhi" else "tidak terpenuhi"`.
+
+### Uji Multikolinearitas
+
+Uji multikolinearitas dilakukan dengan menghitung nilai *Variance Inflation Factor* (VIF) sebagaimana disajikan pada @tbl-vif.
+
+```{r}
+#| label: tbl-vif
+#| tbl-cap: "Hasil uji multikolinearitas (VIF)"
+vifs <- vif(model)
+vifdf <- data.frame(
+  Variabel = c("PDRB per kapita", "Inflasi", "IPM", "Pengangguran",
+               "Akses sanitasi", "TPAK"),
+  VIF = round(as.numeric(vifs[c("pdrb_kapita", "inflasi", "ipm", "pengangguran",
+                                "akses_sanitasi", "tpak")]), 3),
+  check.names = FALSE
+)
+knitr::kable(vifdf)
+```
+
+Seluruh nilai VIF pada @tbl-vif berada di bawah 10, sehingga dapat disimpulkan tidak terdapat gejala multikolinearitas antarvariabel bebas.
+
+### Uji Heteroskedastisitas
+
+Uji heteroskedastisitas dilakukan dengan uji Breusch-Pagan. Pengujian menghasilkan nilai probabilitas sebesar `r f(bptest(model, studentize = FALSE)$p.value, 3)`.
+
+```{r}
+bp <- bptest(model, studentize = FALSE)
+bp_p <- bp$p.value
+```
+
+Karena nilai probabilitas (`r f(bp_p,3)`) `r banding(bp_p)` dari 0,05, model dinyatakan `r if (bp_p > 0.05) "bebas dari masalah heteroskedastisitas" else "mengalami masalah heteroskedastisitas"`.
+
+## Hasil Analisis Regresi Linear Berganda
+
+Hasil estimasi model regresi linear berganda disajikan pada @tbl-regresi.
+
+```{r}
+#| label: tbl-regresi
+#| tbl-cap: "Hasil estimasi regresi linear berganda"
+sm <- summary(model)$coefficients
+res <- data.frame(
+  Variabel     = c("Konstanta", "PDRB per kapita", "Inflasi", "IPM",
+                   "Pengangguran", "Akses sanitasi", "TPAK"),
+  Koefisien    = round(sm[, "Estimate"], 3),
+  `Std. Error` = round(sm[, "Std. Error"], 3),
+  `t-hitung`   = round(sm[, "t value"], 3),
+  `Prob.`      = round(sm[, "Pr(>|t|)"], 3),
+  check.names = FALSE, row.names = NULL
+)
+knitr::kable(res)
+```
+
+```{r}
+b_pdrb <- coef(model)[["pdrb_kapita"]]
+p_pdrb <- summary(model)$coefficients["pdrb_kapita", "Pr(>|t|)"]
+b_inf  <- coef(model)[["inflasi"]]
+p_inf  <- summary(model)$coefficients["inflasi", "Pr(>|t|)"]
+b_ipm  <- coef(model)[["ipm"]]
+p_ipm  <- summary(model)$coefficients["ipm", "Pr(>|t|)"]
+b_tpt  <- coef(model)[["pengangguran"]]
+p_tpt  <- summary(model)$coefficients["pengangguran", "Pr(>|t|)"]
+b_san  <- coef(model)[["akses_sanitasi"]]
+p_san  <- summary(model)$coefficients["akses_sanitasi", "Pr(>|t|)"]
+b_tpak <- coef(model)[["tpak"]]
+p_tpak <- summary(model)$coefficients["tpak", "Pr(>|t|)"]
+r2 <- summary(model)$r.squared
+fstat <- summary(model)$fstatistic
+f_p <- as.numeric(pf(fstat[1], fstat[2], fstat[3], lower.tail = FALSE))
+
+# Rangkai persamaan hasil estimasi (aman untuk LaTeX, tanda otomatis, dua baris)
+eq_str <- paste0(
+  "\\begin{aligned}\\widehat{KMSKN} = {} & ", fm(coef(model)[["(Intercept)"]]),
+  suku(b_pdrb, "PDRB"), suku(b_inf, "INF"), suku(b_ipm, "IPM"), " \\\\ & ",
+  trimws(suku(b_tpt, "PGGR"), "left"), suku(b_san, "SANIT"), suku(b_tpak, "TPAK"),
+  "\\end{aligned}"
+)
+```
+
+Berdasarkan @tbl-regresi, persamaan regresi yang terbentuk adalah:
+
+```{r}
+#| output: asis
+cat("$$\n", eq_str, "\n$$\n", sep = "")
+```
+
+### Uji Signifikansi Parsial (Uji t)
+
+Variabel **PDRB per kapita** memiliki koefisien `r f(b_pdrb,3)` dengan probabilitas `r f(p_pdrb,3)`. Karena probabilitas `r banding(p_pdrb)` dari 0,05, PDRB per kapita berpengaruh `r if (b_pdrb < 0) "negatif" else "positif"` dan `r sig(p_pdrb)` terhadap tingkat kemiskinan, sehingga $H_1$ `r if (p_pdrb < 0.05) "diterima" else "ditolak"`.
+
+Variabel **inflasi** memiliki koefisien `r f(b_inf,3)` dengan probabilitas `r f(p_inf,3)`. Karena probabilitas `r banding(p_inf)` dari 0,05, inflasi berpengaruh `r if (b_inf > 0) "positif" else "negatif"` tetapi `r sig(p_inf)` terhadap tingkat kemiskinan, sehingga $H_2$ `r if (p_inf < 0.05) "diterima" else "ditolak"`.
+
+Di antara variabel kontrol yang berasal dari data pendukung, **akses sanitasi** memiliki koefisien `r f(b_san,3)` dengan probabilitas `r f(p_san,3)` (berpengaruh `r if (b_san < 0) "negatif" else "positif"` dan `r sig(p_san)`), sedangkan **TPAK** memiliki koefisien `r f(b_tpak,3)` dengan probabilitas `r f(p_tpak,3)` (`r sig(p_tpak)`). Dengan demikian, di antara dua variabel tambahan tersebut, yang berpengaruh terhadap kemiskinan adalah `r if (p_san < 0.05 && p_tpak >= 0.05) "akses sanitasi" else if (p_san < 0.05 && p_tpak < 0.05) "akses sanitasi dan TPAK" else if (p_tpak < 0.05) "TPAK" else "tidak ada"`.
+
+### Uji Signifikansi Simultan (Uji F)
+
+Uji F menghasilkan probabilitas sebesar `r f(f_p,4)` yang `r banding(f_p)` dari 0,05. Dengan demikian, PDRB per kapita dan inflasi (bersama variabel kontrol) secara simultan berpengaruh `r sig(f_p)` terhadap tingkat kemiskinan, sehingga $H_3$ `r if (f_p < 0.05) "diterima" else "ditolak"`.
+
+### Koefisien Determinasi
+
+Nilai koefisien determinasi ($R^2$) sebesar `r f(r2,3)`, yang berarti `r f(r2*100,1)` persen keragaman tingkat kemiskinan dapat dijelaskan oleh variabel-variabel dalam model, sedangkan sisanya dijelaskan oleh faktor lain di luar model.
+
+## Pembahasan
+
+Hasil penelitian menunjukkan bahwa **PDRB per kapita berpengaruh negatif dan signifikan** terhadap tingkat kemiskinan. Temuan ini sejalan dengan teori *trickle-down effect* dan hasil @wongdesmiwati2009, yang menyatakan bahwa pertumbuhan ekonomi mampu menurunkan kemiskinan. Setiap kenaikan PDRB per kapita sebesar satu juta rupiah, dengan asumsi variabel lain tetap, menurunkan tingkat kemiskinan sebesar `r f(abs(b_pdrb),3)` poin persen.
+
+Sementara itu, **inflasi berpengaruh positif tetapi tidak signifikan**. Arah pengaruh yang positif konsisten dengan teori bahwa inflasi menurunkan daya beli masyarakat miskin [@sukirno2016]. Ketidaksignifikanan ini dapat disebabkan oleh relatif terkendalinya inflasi selama periode penelitian, sehingga dampaknya terhadap kemiskinan belum cukup kuat secara statistik. Temuan ini menegaskan bahwa pengaruh inflasi terhadap kemiskinan dapat berbeda antarwilayah dan periode.
+
+Variabel kontrol IPM berpengaruh `r if (b_ipm < 0) "negatif" else "positif"` dan `r sig(p_ipm)`, menunjukkan bahwa peningkatan kualitas pembangunan manusia berkontribusi menurunkan kemiskinan. Adapun pengangguran berpengaruh `r if (b_tpt > 0) "positif" else "negatif"` dan `r sig(p_tpt)` terhadap kemiskinan, sesuai dengan ekspektasi teoretis.
+
+Penambahan variabel dari **data pendukung** memperkuat model. Akses sanitasi yang lebih baik berpengaruh `r if (b_san < 0) paste0("negatif dan ", sig(p_san)) else paste0("positif dan ", sig(p_san))` terhadap kemiskinan, menegaskan bahwa pemenuhan kebutuhan dasar berkontribusi pada penurunan kemiskinan. Hasil ini sekaligus menunjukkan manfaat menggabungkan data dari beberapa sumber: variabel penting yang semula berada di berkas terpisah dapat disertakan dalam analisis setelah digabungkan melalui kode wilayah.

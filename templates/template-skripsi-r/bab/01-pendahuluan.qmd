@@ -1,0 +1,77 @@
+# PENDAHULUAN
+
+```{r}
+df <- read.csv("data/data_kemiskinan_jateng.csv")
+df2023 <- df[df$tahun == 2023, ]
+
+# Pembulatan dengan format Indonesia (koma sebagai pemisah desimal)
+a <- function(x, n = 2) gsub(".", ",", sprintf(paste0("%.", n, "f"), x), fixed = TRUE)
+```
+
+## Latar Belakang Masalah
+
+Kemiskinan merupakan salah satu permasalahan pembangunan yang paling mendasar dan
+masih menjadi tantangan utama di banyak daerah di Indonesia, termasuk Provinsi Jawa
+Tengah. Kemiskinan tidak hanya berkaitan dengan rendahnya pendapatan, tetapi juga
+mencerminkan keterbatasan akses terhadap pendidikan, kesehatan, dan kesempatan
+ekonomi [@todaro2015]. Oleh karena itu, pemahaman atas faktor-faktor yang memengaruhi
+tingkat kemiskinan menjadi penting sebagai dasar perumusan kebijakan.
+
+Pada periode 2019--2023, rata-rata tingkat kemiskinan di 35 kabupaten/kota di Jawa
+Tengah tercatat sebesar `r a(mean(df$kemiskinan))` persen, dengan
+nilai tertinggi mencapai `r a(max(df$kemiskinan))` persen dan
+terendah `r a(min(df$kemiskinan))` persen. Variasi yang lebar ini
+menunjukkan adanya kesenjangan antarwilayah yang menarik untuk dikaji.
+
+Pertumbuhan ekonomi yang diukur melalui Produk Domestik Regional Bruto (PDRB) sering
+disebut sebagai faktor utama dalam menurunkan kemiskinan. Secara teoretis,
+peningkatan PDRB per kapita mencerminkan naiknya output dan pendapatan masyarakat,
+yang pada gilirannya diharapkan menurunkan jumlah penduduk miskin [@kuncoro2010].
+Namun, pertumbuhan ekonomi yang tidak merata dapat menyebabkan penurunan kemiskinan
+berjalan lambat.
+
+Selain pertumbuhan ekonomi, stabilitas harga yang dicerminkan oleh tingkat inflasi
+juga diduga memengaruhi kemiskinan. Inflasi yang tinggi menurunkan daya beli
+masyarakat, terutama kelompok berpendapatan rendah yang sebagian besar pengeluarannya
+dialokasikan untuk kebutuhan pokok [@sukirno2016]. Dengan demikian, inflasi berpotensi
+memperburuk kondisi kemiskinan.
+
+Berdasarkan uraian di atas, penelitian ini menganalisis pengaruh PDRB per kapita dan
+inflasi terhadap tingkat kemiskinan di Provinsi Jawa Tengah, dengan menyertakan
+Indeks Pembangunan Manusia (IPM) dan tingkat pengangguran sebagai variabel kontrol.
+
+## Rumusan Masalah
+
+Berdasarkan latar belakang tersebut, rumusan masalah dalam penelitian ini adalah:
+
+1. Bagaimana pengaruh PDRB per kapita terhadap tingkat kemiskinan di Provinsi Jawa
+   Tengah?
+2. Bagaimana pengaruh inflasi terhadap tingkat kemiskinan di Provinsi Jawa Tengah?
+3. Bagaimana pengaruh PDRB per kapita dan inflasi secara bersama-sama terhadap tingkat
+   kemiskinan di Provinsi Jawa Tengah?
+
+## Tujuan dan Manfaat Penelitian
+
+### Tujuan Penelitian
+
+Sejalan dengan rumusan masalah, tujuan penelitian ini adalah untuk menganalisis
+pengaruh PDRB per kapita terhadap tingkat kemiskinan, menganalisis pengaruh inflasi
+terhadap tingkat kemiskinan, dan menganalisis pengaruh keduanya secara simultan
+terhadap tingkat kemiskinan di Provinsi Jawa Tengah.
+
+### Manfaat Penelitian
+
+Penelitian ini diharapkan memberikan manfaat teoretis sebagai bahan rujukan bagi
+pengembangan ilmu ekonomi pembangunan, khususnya kajian kemiskinan. Secara praktis,
+hasil penelitian diharapkan dapat menjadi masukan bagi pemerintah daerah dalam
+merumuskan kebijakan penanggulangan kemiskinan.
+
+## Sistematika Penulisan
+
+Skripsi ini disusun dalam lima bab. **BAB I** memuat pendahuluan yang berisi latar
+belakang, rumusan masalah, tujuan dan manfaat, serta sistematika penulisan. **BAB II**
+menyajikan tinjauan pustaka yang mencakup landasan teori, penelitian terdahulu,
+kerangka pemikiran, dan hipotesis. **BAB III** menjelaskan metode penelitian, meliputi
+variabel penelitian, jenis dan sumber data, serta metode analisis. **BAB IV**
+memaparkan hasil penelitian dan pembahasan. **BAB V** berisi penutup yang terdiri atas
+kesimpulan dan saran.

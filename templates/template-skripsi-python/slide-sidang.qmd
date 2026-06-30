@@ -1,0 +1,164 @@
+---
+title: "Pengaruh PDRB dan Inflasi terhadap Tingkat Kemiskinan"
+subtitle: "Studi pada 35 Kabupaten/Kota di Provinsi Jawa Tengah"
+author: "Nama Mahasiswa — NIM 12345678"
+institute: "Program Studi … — Universitas Diponegoro"
+date: today
+date-format: "D MMMM YYYY"
+lang: id
+jupyter: python3
+# Satu sumber, dua keluaran slide:
+#   quarto render slide-sidang.qmd --to revealjs   ->  slide-sidang.html  (untuk layar/web)
+#   quarto render slide-sidang.qmd --to beamer     ->  slide-sidang.pdf   (untuk proyektor/cetak)
+#   quarto render slide-sidang.qmd                 ->  kedua-duanya
+format:
+  revealjs:
+    theme: simple
+    slide-number: true
+    transition: slide
+    incremental: false
+    fig-width: 7
+    fig-height: 4
+  beamer:
+    theme: Madrid
+    aspectratio: 169
+    fig-width: 6
+    fig-height: 3.4
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{python}
+#| label: setup
+import pandas as pd
+import matplotlib.pyplot as plt
+import statsmodels.formula.api as smf
+from IPython.display import Markdown
+df = pd.read_csv("data/data_kemiskinan_jateng.csv")
+df23 = df[df["tahun"] == 2023]
+```
+
+# Pendahuluan
+
+## Latar Belakang
+
+- Kemiskinan tetap menjadi tantangan pembangunan di **Jawa Tengah**.
+- Dua faktor makro yang sering disorot:
+  - **PDRB per kapita** — cerminan output ekonomi daerah.
+  - **Inflasi** — menggerus daya beli, terutama kelompok rentan.
+- Penelitian ini menguji pengaruh keduanya terhadap **tingkat kemiskinan**
+  pada **35 kabupaten/kota** (data panel 2019–2023).
+
+## Rumusan Masalah & Tujuan
+
+::: {.columns}
+::: {.column width="50%"}
+**Rumusan masalah**
+
+1. Apakah PDRB per kapita berpengaruh terhadap kemiskinan?
+2. Apakah inflasi berpengaruh terhadap kemiskinan?
+:::
+::: {.column width="50%"}
+**Tujuan**
+
+- Mengukur arah dan besar pengaruh PDRB per kapita.
+- Mengukur arah dan besar pengaruh inflasi.
+- Memberi masukan kebijakan pengentasan kemiskinan.
+:::
+:::
+
+# Metode Penelitian
+
+## Data & Metode
+
+- **Jenis:** data panel 35 kabupaten/kota × 5 tahun (2019–2023).
+- **Variabel terikat:** tingkat kemiskinan (%).
+- **Variabel bebas:** PDRB per kapita, inflasi (kontrol: IPM, pengangguran).
+- **Analisis:** regresi linear berganda (OLS) dengan uji asumsi klasik.
+
+$$
+\text{Kemiskinan} = \beta_0 + \beta_1\,\text{PDRB} + \beta_2\,\text{Inflasi} + \varepsilon
+$$
+
+# Hasil dan Pembahasan
+
+## Statistik Deskriptif (2023)
+
+```{python}
+#| label: tbl-deskriptif
+ringkas = pd.DataFrame({
+    "Variabel": ["Kemiskinan (%)", "PDRB per kapita (juta)", "Inflasi (%)"],
+    "Rerata":   [df23["kemiskinan"].mean(), df23["pdrb_kapita"].mean(), df23["inflasi"].mean()],
+    "Minimum":  [df23["kemiskinan"].min(),  df23["pdrb_kapita"].min(),  df23["inflasi"].min()],
+    "Maksimum": [df23["kemiskinan"].max(),  df23["pdrb_kapita"].max(),  df23["inflasi"].max()],
+})
+Markdown(ringkas.to_markdown(index=False, floatfmt=".2f"))
+```
+
+## Tren Kemiskinan Provinsi
+
+```{python}
+#| label: fig-tren
+#| fig-cap: "Rata-rata tingkat kemiskinan Jawa Tengah, 2019–2023"
+tren = df.groupby("tahun")["kemiskinan"].mean()
+fig, ax = plt.subplots(figsize=(7, 4))
+ax.plot(tren.index, tren.values, "-o", color="#b03a2e", linewidth=2)
+ax.set_xlabel("Tahun"); ax.set_ylabel("Kemiskinan (%)")
+ax.grid(alpha=0.3)
+plt.tight_layout(); plt.show()
+```
+
+## Sebaran Kemiskinan Antarwilayah (2023)
+
+```{python}
+#| label: fig-peta
+#| fig-cap: "Tingkat kemiskinan kabupaten/kota di Jawa Tengah, 2023"
+import geopandas as gpd
+import contextily as ctx
+geo = gpd.read_file("data/jateng.geojson")
+peta = geo.merge(df23, on="wilayah", how="left").to_crs(3857)
+fig, ax = plt.subplots(figsize=(7, 4))
+peta.plot(column="kemiskinan", cmap="OrRd", legend=True, alpha=0.85,
+          edgecolor="white", linewidth=0.3, ax=ax)
+ctx.add_basemap(ax, source=ctx.providers.OpenStreetMap.Mapnik)
+ax.set_axis_off()
+plt.tight_layout(); plt.show()
+```
+
+## Hasil Regresi
+
+```{python}
+#| label: tbl-regresi
+model = smf.ols("kemiskinan ~ pdrb_kapita + inflasi + ipm + pengangguran", data=df).fit()
+koef = pd.DataFrame({"Koefisien": model.params, "p-value": model.pvalues})
+koef.index = ["Konstanta", "PDRB per kapita", "Inflasi", "IPM", "Pengangguran"]
+Markdown(koef.to_markdown(floatfmt=".3f"))
+```
+
+. . .
+
+- **PDRB per kapita**: arah pengaruh sesuai hipotesis.
+- **Inflasi**: lihat tanda koefisien dan signifikansinya.
+- Model menjelaskan sebagian variasi kemiskinan antarwilayah ($R^2$).
+
+# Penutup
+
+## Kesimpulan
+
+- PDRB per kapita dan inflasi **berkaitan** dengan tingkat kemiskinan
+  kabupaten/kota di Jawa Tengah.
+- Implikasi kebijakan: dorong produktivitas ekonomi daerah sambil menjaga
+  stabilitas harga.
+- **Keterbatasan & saran**: cakupan wilayah/tahun, variabel tambahan,
+  metode panel (*fixed/random effects*) untuk penelitian lanjutan.
+
+## Terima Kasih {.center}
+
+**Pertanyaan dan masukan dipersilakan.**
+
+::: {.notes}
+Catatan pembicara: tekankan arah pengaruh sesuai hipotesis, lalu siap menjawab
+pertanyaan soal uji asumsi klasik.
+:::

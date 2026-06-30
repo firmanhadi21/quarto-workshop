@@ -1,0 +1,67 @@
+# TINJAUAN PUSTAKA
+
+## Landasan Teori
+
+### Konsep Kemiskinan
+
+Kemiskinan didefinisikan sebagai ketidakmampuan individu atau rumah tangga untuk
+memenuhi kebutuhan dasar minimum, baik dari sisi pangan maupun nonpangan
+[@todaro2015]. Badan Pusat Statistik mengukur kemiskinan melalui pendekatan kebutuhan
+dasar (*basic needs approach*), yaitu dengan menetapkan garis kemiskinan sebagai nilai
+rupiah pengeluaran minimum yang diperlukan untuk memenuhi kebutuhan pokok
+[@bps2024]. Penduduk yang pengeluaran per kapitanya berada di bawah garis kemiskinan
+dikategorikan sebagai penduduk miskin.
+
+### Produk Domestik Regional Bruto (PDRB)
+
+PDRB merupakan jumlah nilai tambah bruto yang dihasilkan oleh seluruh unit usaha dalam
+suatu wilayah, atau merupakan nilai barang dan jasa akhir yang dihasilkan oleh seluruh
+unit ekonomi [@kuncoro2010]. PDRB per kapita, yang diperoleh dengan membagi PDRB
+dengan jumlah penduduk, sering digunakan sebagai indikator tingkat kesejahteraan
+ekonomi suatu daerah. Berdasarkan teori *trickle-down effect*, pertumbuhan ekonomi
+yang ditunjukkan oleh peningkatan PDRB diharapkan menetes ke seluruh lapisan
+masyarakat sehingga menurunkan kemiskinan.
+
+### Inflasi
+
+Inflasi adalah kecenderungan meningkatnya harga barang dan jasa secara umum dan
+terus-menerus dalam suatu periode tertentu [@sukirno2016]. Inflasi yang tinggi
+menurunkan daya beli masyarakat, khususnya kelompok berpendapatan tetap dan rendah.
+Karena kelompok miskin mengalokasikan sebagian besar pengeluarannya untuk kebutuhan
+pokok, kenaikan harga berdampak lebih besar terhadap mereka, sehingga inflasi diduga
+berhubungan positif dengan tingkat kemiskinan [@mankiw2018].
+
+### Indeks Pembangunan Manusia dan Pengangguran
+
+Indeks Pembangunan Manusia (IPM) mengukur capaian pembangunan manusia berbasis
+dimensi umur panjang dan sehat, pengetahuan, serta standar hidup layak. IPM yang
+tinggi mencerminkan kualitas sumber daya manusia yang lebih baik dan diduga menurunkan
+kemiskinan. Sementara itu, tingkat pengangguran yang tinggi menunjukkan rendahnya
+penyerapan tenaga kerja sehingga berpotensi meningkatkan kemiskinan.
+
+## Penelitian Terdahulu
+
+Sejumlah penelitian terdahulu menjadi rujukan dalam studi ini. @wongdesmiwati2009
+menemukan bahwa pertumbuhan ekonomi berpengaruh negatif terhadap kemiskinan di
+Indonesia. @prawoto2009 menjelaskan berbagai dimensi kemiskinan serta strategi
+penanggulangannya. Studi-studi tersebut umumnya menyimpulkan bahwa pertumbuhan
+ekonomi merupakan faktor penting penurunan kemiskinan, meskipun pengaruh inflasi
+menunjukkan hasil yang beragam antarwilayah dan periode.
+
+## Kerangka Pemikiran
+
+Berdasarkan landasan teori dan penelitian terdahulu, kerangka pemikiran penelitian
+ini menempatkan PDRB per kapita dan inflasi sebagai variabel bebas utama, dengan IPM
+dan tingkat pengangguran sebagai variabel kontrol, yang memengaruhi tingkat kemiskinan
+sebagai variabel terikat. PDRB per kapita dan IPM diduga berpengaruh negatif terhadap
+kemiskinan, sedangkan inflasi dan pengangguran diduga berpengaruh positif.
+
+## Hipotesis
+
+Berdasarkan kerangka pemikiran tersebut, hipotesis penelitian ini dirumuskan sebagai
+berikut:
+
+- $H_1$: PDRB per kapita berpengaruh negatif dan signifikan terhadap tingkat kemiskinan.
+- $H_2$: Inflasi berpengaruh positif dan signifikan terhadap tingkat kemiskinan.
+- $H_3$: PDRB per kapita dan inflasi secara bersama-sama berpengaruh signifikan
+  terhadap tingkat kemiskinan.

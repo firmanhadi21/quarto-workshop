@@ -1,0 +1,255 @@
+# HASIL DAN PEMBAHASAN
+
+```{python}
+#| label: setup-analisis
+import pandas as pd
+import numpy as np
+import statsmodels.formula.api as smf
+import statsmodels.api as sm
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+from statsmodels.stats.diagnostic import het_breuschpagan
+from IPython.display import Markdown
+
+# Baca dua sumber data lalu gabungkan berdasarkan kode_wilayah + tahun
+utama = pd.read_csv("data/data_kemiskinan_jateng.csv")
+pendukung = pd.read_json("data/data_pendukung_jateng.json")
+df = utama.merge(pendukung, on=["kode_wilayah", "tahun"], how="left")
+
+# Estimasi model regresi linear berganda
+model = smf.ols(
+    "kemiskinan ~ pdrb_kapita + inflasi + ipm + pengangguran "
+    "+ akses_sanitasi + tpak", data=df
+).fit()
+
+def f(x, n=3):
+    return f"{x:.{n}f}".replace(".", ",")
+
+# Pembanding otomatis terhadap taraf nyata 0,05 (agar narasi selalu sesuai angka)
+def banding(p, alpha=0.05):
+    return "lebih kecil" if p < alpha else "lebih besar"
+
+def sig(p, alpha=0.05):
+    return "signifikan" if p < alpha else "tidak signifikan"
+
+# Angka desimal aman untuk mode matematika LaTeX (koma terlindungi: {,})
+def fm(x, n=3):
+    return f"{x:.{n}f}".replace(".", "{,}")
+
+# Suku persamaan dengan tanda + / - otomatis
+def suku(coef, nama, n=3):
+    tanda = "-" if coef < 0 else "+"
+    return f" {tanda} {fm(abs(coef), n)}\\,{nama}"
+```
+
+## Deskripsi Objek Penelitian
+
+Objek penelitian ini adalah 35 kabupaten/kota di Provinsi Jawa Tengah selama periode
+2019--2023. Statistik deskriptif variabel penelitian disajikan pada @tbl-deskriptif.
+
+```{python}
+#| label: tbl-deskriptif
+#| tbl-cap: "Statistik deskriptif variabel penelitian"
+tab = df[["kemiskinan", "pdrb_kapita", "inflasi", "pengangguran", "ipm",
+          "akses_sanitasi", "tpak"]].agg(["mean", "std", "min", "max"]).round(2).T
+tab.columns = ["Rata-rata", "Std. Deviasi", "Minimum", "Maksimum"]
+tab.index = ["Kemiskinan (%)", "PDRB/kapita (juta Rp)", "Inflasi (%)",
+             "Pengangguran (%)", "IPM", "Akses sanitasi (%)", "TPAK (%)"]
+Markdown(tab.to_markdown())
+```
+
+Berdasarkan @tbl-deskriptif, rata-rata tingkat kemiskinan sebesar
+`{python} f(df['kemiskinan'].mean(), 2)` persen dengan rentang yang cukup lebar,
+menunjukkan adanya disparitas antarwilayah di Jawa Tengah. Disparitas spasial ini
+tampak lebih jelas pada peta sebaran tingkat kemiskinan menurut kabupaten/kota tahun
+2023 yang disajikan pada @fig-peta-kemiskinan.
+
+```{python}
+#| label: fig-peta-kemiskinan
+#| fig-cap: "Sebaran tingkat kemiskinan menurut kabupaten/kota di Jawa Tengah, 2023"
+import geopandas as gpd
+import matplotlib.pyplot as plt
+import contextily as ctx
+
+# Gabungkan data kemiskinan dengan batas wilayah GADM (https://gadm.org),
+# lalu proyeksikan ke Web Mercator agar selaras dengan basemap OSM.
+geo = gpd.read_file("data/jateng.geojson")
+peta = geo.merge(df[df["tahun"] == 2023], on="wilayah", how="left").to_crs(3857)
+
+fig, ax = plt.subplots(figsize=(7.5, 4.8))
+peta.plot(column="kemiskinan", cmap="OrRd", legend=True, alpha=0.75,
+          edgecolor="white", linewidth=0.3, ax=ax,
+          legend_kwds={"label": "Tingkat kemiskinan (%)", "shrink": 0.6})
+# Basemap OpenStreetMap (memerlukan koneksi internet saat render)
+ctx.add_basemap(ax, source=ctx.providers.OpenStreetMap.Mapnik)
+ax.set_axis_off()
+plt.tight_layout()
+plt.show()
+```
+
+Peta pada @fig-peta-kemiskinan memperlihatkan bahwa wilayah dengan tingkat kemiskinan
+tinggi (warna lebih gelap) cenderung mengelompok di beberapa kabupaten, sementara
+daerah perkotaan umumnya memiliki tingkat kemiskinan yang lebih rendah.
+
+## Hasil Uji Asumsi Klasik
+
+### Uji Normalitas
+
+Uji normalitas dilakukan terhadap residual model menggunakan uji Jarque-Bera. Hasil
+pengujian menghasilkan nilai probabilitas sebesar
+`{python} f(float(sm.stats.stattools.jarque_bera(model.resid)[1]), 3)`.
+
+```{python}
+jb_stat, jb_p, _, _ = sm.stats.stattools.jarque_bera(model.resid)
+```
+
+Karena nilai probabilitas (`{python} f(jb_p,3)`) `{python} banding(jb_p)` dari 0,05,
+residual dinyatakan `{python} "berdistribusi normal" if jb_p>0.05 else "tidak berdistribusi normal"`
+sehingga asumsi normalitas `{python} "terpenuhi" if jb_p>0.05 else "tidak terpenuhi"`.
+
+### Uji Multikolinearitas
+
+Uji multikolinearitas dilakukan dengan menghitung nilai *Variance Inflation Factor*
+(VIF) sebagaimana disajikan pada @tbl-vif.
+
+```{python}
+#| label: tbl-vif
+#| tbl-cap: "Hasil uji multikolinearitas (VIF)"
+X = df[["pdrb_kapita", "inflasi", "ipm", "pengangguran", "akses_sanitasi", "tpak"]]
+Xc = sm.add_constant(X)
+vif = pd.DataFrame({
+    "Variabel": ["PDRB per kapita", "Inflasi", "IPM", "Pengangguran",
+                 "Akses sanitasi", "TPAK"],
+    "VIF": [round(variance_inflation_factor(Xc.values, i), 3) for i in range(1, Xc.shape[1])]
+})
+Markdown(vif.to_markdown(index=False))
+```
+
+Seluruh nilai VIF pada @tbl-vif berada di bawah 10, sehingga dapat disimpulkan tidak
+terdapat gejala multikolinearitas antarvariabel bebas.
+
+### Uji Heteroskedastisitas
+
+Uji heteroskedastisitas dilakukan dengan uji Breusch-Pagan. Pengujian menghasilkan
+nilai probabilitas sebesar
+`{python} f(float(het_breuschpagan(model.resid, model.model.exog)[1]), 3)`.
+
+```{python}
+bp = het_breuschpagan(model.resid, model.model.exog)
+bp_p = bp[1]
+```
+
+Karena nilai probabilitas (`{python} f(bp_p,3)`) `{python} banding(bp_p)` dari 0,05,
+model dinyatakan `{python} "bebas dari masalah heteroskedastisitas" if bp_p>0.05 else "mengalami masalah heteroskedastisitas"`.
+
+## Hasil Analisis Regresi Linear Berganda
+
+Hasil estimasi model regresi linear berganda disajikan pada @tbl-regresi.
+
+```{python}
+#| label: tbl-regresi
+#| tbl-cap: "Hasil estimasi regresi linear berganda"
+res = pd.DataFrame({
+    "Variabel": ["Konstanta", "PDRB per kapita", "Inflasi", "IPM", "Pengangguran",
+                 "Akses sanitasi", "TPAK"],
+    "Koefisien": model.params.round(3).values,
+    "Std. Error": model.bse.round(3).values,
+    "t-hitung": model.tvalues.round(3).values,
+    "Prob.": model.pvalues.round(3).values,
+})
+Markdown(res.to_markdown(index=False))
+```
+
+```{python}
+b_pdrb = model.params["pdrb_kapita"]
+p_pdrb = model.pvalues["pdrb_kapita"]
+b_inf = model.params["inflasi"]
+p_inf = model.pvalues["inflasi"]
+b_ipm = model.params["ipm"]
+p_ipm = model.pvalues["ipm"]
+b_tpt = model.params["pengangguran"]
+p_tpt = model.pvalues["pengangguran"]
+b_san = model.params["akses_sanitasi"]
+p_san = model.pvalues["akses_sanitasi"]
+b_tpak = model.params["tpak"]
+p_tpak = model.pvalues["tpak"]
+r2 = model.rsquared
+f_p = model.f_pvalue
+
+# Rangkai persamaan hasil estimasi (aman untuk LaTeX, tanda otomatis, dua baris)
+eq_str = (r"\begin{aligned}\widehat{KMSKN} = {} & " + fm(model.params["Intercept"])
+          + suku(b_pdrb, "PDRB") + suku(b_inf, "INF") + suku(b_ipm, "IPM") + r" \\ & "
+          + suku(b_tpt, "PGGR").lstrip() + suku(b_san, "SANIT") + suku(b_tpak, "TPAK")
+          + r"\end{aligned}")
+```
+
+Berdasarkan @tbl-regresi, persamaan regresi yang terbentuk adalah:
+
+```{python}
+#| output: asis
+print("$$\n" + eq_str + "\n$$")
+```
+
+### Uji Signifikansi Parsial (Uji t)
+
+Variabel **PDRB per kapita** memiliki koefisien `{python} f(b_pdrb,3)` dengan
+probabilitas `{python} f(p_pdrb,3)`. Karena probabilitas `{python} banding(p_pdrb)`
+dari 0,05, PDRB per kapita berpengaruh `{python} "negatif" if b_pdrb<0 else "positif"`
+dan `{python} sig(p_pdrb)` terhadap tingkat kemiskinan, sehingga
+**$H_1$ `{python} "diterima" if p_pdrb<0.05 else "ditolak"`**.
+
+Variabel **inflasi** memiliki koefisien `{python} f(b_inf,3)` dengan probabilitas
+`{python} f(p_inf,3)`. Karena probabilitas `{python} banding(p_inf)` dari 0,05,
+inflasi berpengaruh `{python} "positif" if b_inf>0 else "negatif"` tetapi
+`{python} sig(p_inf)` terhadap tingkat kemiskinan, sehingga **$H_2$
+`{python} "diterima" if p_inf<0.05 else "ditolak"`**.
+
+Di antara variabel kontrol yang berasal dari data pendukung, **akses sanitasi**
+memiliki koefisien `{python} f(b_san,3)` dengan probabilitas `{python} f(p_san,3)`
+(berpengaruh `{python} "negatif" if b_san<0 else "positif"` dan `{python} sig(p_san)`),
+sedangkan **TPAK** memiliki koefisien `{python} f(b_tpak,3)` dengan probabilitas
+`{python} f(p_tpak,3)` (`{python} sig(p_tpak)`). Dengan demikian, di antara dua
+variabel tambahan tersebut, yang berpengaruh terhadap kemiskinan adalah
+`{python} "akses sanitasi" if p_san<0.05 and p_tpak>=0.05 else ("akses sanitasi dan TPAK" if p_san<0.05 and p_tpak<0.05 else ("TPAK" if p_tpak<0.05 else "tidak ada"))`.
+
+### Uji Signifikansi Simultan (Uji F)
+
+Uji F menghasilkan probabilitas sebesar `{python} f(f_p,4)` yang `{python} banding(f_p)`
+dari 0,05. Dengan demikian, PDRB per kapita dan inflasi (bersama variabel kontrol)
+secara simultan berpengaruh `{python} sig(f_p)` terhadap tingkat kemiskinan, sehingga
+**$H_3$ `{python} "diterima" if f_p<0.05 else "ditolak"`**.
+
+### Koefisien Determinasi
+
+Nilai koefisien determinasi ($R^2$) sebesar `{python} f(r2,3)`, yang berarti
+`{python} f(r2*100,1)` persen keragaman tingkat kemiskinan dapat dijelaskan oleh
+variabel-variabel dalam model, sedangkan sisanya dijelaskan oleh faktor lain di luar
+model.
+
+## Pembahasan
+
+Hasil penelitian menunjukkan bahwa **PDRB per kapita berpengaruh negatif dan
+signifikan** terhadap tingkat kemiskinan. Temuan ini sejalan dengan teori
+*trickle-down effect* dan hasil @wongdesmiwati2009, yang menyatakan bahwa pertumbuhan
+ekonomi mampu menurunkan kemiskinan. Setiap kenaikan PDRB per kapita sebesar satu juta
+rupiah, dengan asumsi variabel lain tetap, menurunkan tingkat kemiskinan sebesar
+`{python} f(abs(b_pdrb),3)` poin persen.
+
+Sementara itu, **inflasi berpengaruh positif tetapi tidak signifikan**. Arah pengaruh
+yang positif konsisten dengan teori bahwa inflasi menurunkan daya beli masyarakat
+miskin [@sukirno2016]. Ketidaksignifikanan ini dapat disebabkan oleh relatif
+terkendalinya inflasi selama periode penelitian, sehingga dampaknya terhadap
+kemiskinan belum cukup kuat secara statistik. Temuan ini menegaskan bahwa pengaruh
+inflasi terhadap kemiskinan dapat berbeda antarwilayah dan periode.
+
+Variabel kontrol IPM berpengaruh `{python} "negatif" if b_ipm<0 else "positif"` dan
+`{python} sig(p_ipm)`, menunjukkan bahwa peningkatan kualitas pembangunan manusia
+berkontribusi menurunkan kemiskinan. Adapun pengangguran berpengaruh
+`{python} "positif" if b_tpt>0 else "negatif"` dan `{python} sig(p_tpt)` terhadap
+kemiskinan, sesuai dengan ekspektasi teoretis.
+
+Penambahan variabel dari **data pendukung** memperkuat model. Akses sanitasi yang
+lebih baik berpengaruh `{python} "negatif dan " + sig(p_san) if b_san<0 else "positif dan " + sig(p_san)`
+terhadap kemiskinan, menegaskan bahwa pemenuhan kebutuhan dasar berkontribusi pada
+penurunan kemiskinan. Hasil ini sekaligus menunjukkan manfaat menggabungkan data dari
+beberapa sumber: variabel penting yang semula berada di berkas terpisah dapat
+disertakan dalam analisis setelah digabungkan melalui kode wilayah.
