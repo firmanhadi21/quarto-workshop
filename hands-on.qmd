@@ -1,0 +1,174 @@
+---
+title: "Hands-on: Quarto dalam 1 Jam"
+subtitle: "Dari dokumen kosong ke PDF, grafik, dan slide — semua dari data Anda"
+lang: id
+---
+
+> 🌐 **English version:** [read this in English](en/hands-on.qmd)
+
+::: {.callout-warning}
+## Sebelum sesi (WAJIB pasang lebih dulu)
+Memasang R/RStudio/TinyTeX bisa makan ±30–60 menit, jadi **lakukan sebelum workshop** agar
+1 jam kita habis untuk *praktik*, bukan mengunduh.
+
+1. **R** — <https://cloud.r-project.org/>
+2. **RStudio Desktop** — <https://posit.co/download/rstudio-desktop/> (sudah membawa **Quarto**)
+3. Di **Terminal** RStudio: `quarto install tinytex`
+4. Di **Console** RStudio: `install.packages(c("rmarkdown","knitr","dplyr","ggplot2"))`
+5. *(Opsional, untuk contoh Python)* `pip install jupyter pandas matplotlib` + paket `reticulate`.
+
+Sudah? Bagus. Di sesi kita cukup memverifikasi dengan `quarto check`.
+:::
+
+## Agenda (±60 menit)
+
+| Waktu | Kegiatan |
+|---|---|
+| ⏱️ 5′ | **0.** Cek kesiapan |
+| ⏱️ 10′ | **1.** Dokumen pertama (HTML + PDF) |
+| ⏱️ 15′ | **2.** Tulisan + kode + data |
+| ⏱️ 10′ | **3.** Bukti *reproducible* (ubah data) |
+| ⏱️ 10′ | **4.** Slide dari data yang sama |
+| ⏱️ 10′ | **5.** Tanya jawab & langkah lanjut |
+
+Unduh data contoh: **`data/data_kemiskinan_jateng.csv`** (dari repositori workshop). Taruh
+di folder kerja Anda, di dalam subfolder `data/`.
+
+---
+
+## ⏱️ 0 · Cek kesiapan (5′)
+
+Buat folder kerja baru, buka di RStudio, lalu di **Terminal**:
+
+```bash
+quarto check
+```
+
+Cari **(✓)** untuk Quarto dan LaTeX. (Bila pakai Python: juga untuk Jupyter.)
+
+## ⏱️ 1 · Dokumen pertama (10′)
+
+Buat `halo.qmd`:
+
+````markdown
+---
+title: "Halo Quarto"
+format: html
+---
+
+## Selamat datang
+Paragraf biasa: **tebal**, *miring*, `kode`. Daftar:
+
+- satu
+- dua
+````
+
+Tekan **Render** (atau `quarto render halo.qmd`). Lalu ganti `format: html` → `format: pdf`,
+render lagi. **Isi sama, dua keluaran.** 🎉
+
+## ⏱️ 2 · Tulisan + kode + data (15′)
+
+Inti Quarto: kode dijalankan saat render; hasilnya masuk ke dokumen. Buat `analisis.qmd`
+(pilih R **atau** Python):
+
+::: {.panel-tabset}
+### R
+
+````markdown
+---
+title: "Kemiskinan Jawa Tengah"
+format: html
+---
+
+```{{r}}
+library(dplyr); library(ggplot2)
+df <- read.csv("data/data_kemiskinan_jateng.csv")
+df23 <- df[df$tahun == 2023, ]
+```
+
+Rata-rata kemiskinan 2023 = **`r round(mean(df23$kemiskinan), 2)`%**.
+
+```{{r}}
+df |> group_by(tahun) |> summarise(rata = mean(kemiskinan)) |>
+  ggplot(aes(tahun, rata)) + geom_line() + geom_point() +
+  labs(x = "Tahun", y = "Kemiskinan (%)")
+```
+````
+
+### Python
+
+````markdown
+---
+title: "Kemiskinan Jawa Tengah"
+format: html
+jupyter: python3
+---
+
+```{{python}}
+import pandas as pd, matplotlib.pyplot as plt
+df = pd.read_csv("data/data_kemiskinan_jateng.csv")
+df23 = df[df["tahun"] == 2023]
+print(f"Rata-rata 2023: {df23['kemiskinan'].mean():.2f}%")
+```
+
+```{{python}}
+df.groupby("tahun")["kemiskinan"].mean().plot(marker="o")
+plt.xlabel("Tahun"); plt.ylabel("Kemiskinan (%)"); plt.show()
+```
+````
+:::
+
+Render. Perhatikan: **angka di kalimat** dan **grafik** sama-sama dari data — tanpa salin-tempel.
+
+## ⏱️ 3 · Bukti *reproducible* (10′) {#sec-repro}
+
+Momen "aha":
+
+1. Buka `data/data_kemiskinan_jateng.csv`.
+2. Ubah **Kota Semarang 2023** dari `4.58` → `24.58`. **Simpan.**
+3. **Render ulang** `analisis.qmd`.
+
+Angka rata-rata dan grafik langsung berubah. Satu edit data → seluruh dokumen ikut.
+
+::: {.callout-important}
+## Wajib tahu: `quarto render`, bukan sekadar *preview*
+Pratinjau langsung (*live preview* di `localhost`) **tidak memantau berkas data**. Setelah
+mengubah **data**, jalankan **`quarto render`** di Terminal lalu buka hasilnya — atau
+ubah-simpan sebuah `.qmd` agar pratinjau menyegarkan. *(Ini jebakan paling umum.)*
+:::
+
+## ⏱️ 4 · Slide dari data yang sama (10′)
+
+Tak perlu menulis ulang. Ubah header `analisis.qmd` agar punya **dua format slide**:
+
+````markdown
+---
+title: "Kemiskinan Jawa Tengah"
+format:
+  revealjs: default     # slide HTML (layar/web)
+  beamer:               # slide PDF (proyektor)
+    aspectratio: 169
+---
+````
+
+Lalu:
+
+```bash
+quarto render analisis.qmd --to revealjs   # -> analisis.html
+quarto render analisis.qmd --to beamer     # -> analisis.pdf
+```
+
+Judul `##` menjadi satu slide; grafik tadi muncul di slide — tetap dari data yang sama.
+
+## ⏱️ 5 · Selesai & langkah lanjut (10′)
+
+Anda baru saja: menulis dokumen, menjalankan analisis di dalamnya, membuktikan
+*reproducibility*, dan membuat slide — **semua dari satu sumber**.
+
+Lanjutkan:
+
+- 📘 **Buku "Quarto untuk Skripsi"** (lengkap, BAB I–V, templat siap pakai) —
+  <https://firmanhadi21.github.io/thesis-with-quarto/>
+- 📦 **Templat skripsi (R & Python) + slide sidang** — di repositori buku.
+- 📑 **Dokumentasi Quarto** — <https://quarto.org/docs/guide/>
+- 🔖 **Sitasi via Zotero** — <https://quarto.org/docs/authoring/citations.html>

@@ -1,0 +1,158 @@
+---
+title: "Quarto for Scientific Writing"
+subtitle: "Reproducible documents for students & researchers"
+author: "Workshop · Zoom"
+date: today
+date-format: "D MMMM YYYY"
+lang: en
+engine: knitr
+format:
+  beamer:
+    theme: Madrid
+    aspectratio: 169
+    fig-width: 6
+    fig-height: 3.2
+  revealjs:
+    theme: simple
+    slide-number: true
+    fig-width: 7
+    fig-height: 4
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup
+library(dplyr); library(ggplot2)
+df <- read.csv("../data/data_kemiskinan_jateng.csv")
+df23 <- df[df$tahun == 2023, ]
+```
+
+# Why Quarto?
+
+## Who is this workshop for?
+
+- 🎓 **Students** — quantitative thesis: data, tables, figures, citations, campus-formatted PDF.
+- 🔬 **Lecturers & researchers** — **reproducible** papers, reports, and presentations.
+
+\vspace{1em}
+One tool, one workflow — from analysis to finished document.
+
+## The old way hurts
+
+| Word + SPSS/Excel | With Quarto |
+|---|---|
+| Copy numbers by hand → typos | Numbers **automatic** from code |
+| Table/figure numbering breaks | Numbering & TOC **automatic** |
+| Revise data = redo & re-paste | Change data → **re-render** |
+| Manual citations | Automatic citations (APA, Zotero) |
+| Slides built separately | Slides from the **same data** |
+
+## What is Quarto?
+
+A publishing system: **prose + code + data** in one `.qmd` file.
+
+```
+  .qmd  ──►  Quarto  ──►  PDF · HTML · Word · Slides
+```
+
+- Free & open source. Supports **R** and **Python**.
+- **Write once, render many.**
+
+# The core: data lives in the document
+
+## Numbers & charts straight from data {.fragile}
+
+The mean poverty rate in Central Java **2023 = `r round(mean(df23$kemiskinan),2)`%**
+(computed at render time, not typed).
+
+```{r}
+#| fig-cap: "Mean poverty trend (from the data)"
+df |> group_by(tahun) |> summarise(rata = mean(kemiskinan)) |>
+  ggplot(aes(tahun, rata)) +
+  geom_line(color = "#b03a2e", linewidth = 1) + geom_point(size = 2, color = "#b03a2e") +
+  labs(x = "Year", y = "Poverty (%)") + theme_minimal(base_size = 13)
+```
+
+## Maps too, from the same data
+
+```{r}
+#| fig-cap: "Poverty by district, 2023"
+#| fig-height: 3.0
+library(sf); library(maptiles); library(tidyterra)
+geo <- st_transform(st_read("../data/jateng.geojson", quiet = TRUE), 3857)
+peta <- merge(geo, df23, by = "wilayah", all.x = TRUE)
+latar <- get_tiles(peta, provider = "OpenStreetMap", zoom = 8, crop = TRUE)
+ggplot() + geom_spatraster_rgb(data = latar) +
+  geom_sf(data = peta, aes(fill = kemiskinan), color = "white", linewidth = 0.1, alpha = 0.85) +
+  scale_fill_distiller(palette = "OrRd", direction = 1, name = "%") + theme_void()
+```
+
+## The killer feature: *reproducible* {.fragile}
+
+> **Change one number in the data → the whole document updates:**
+> inline numbers, tables, figures, **maps**, even **slides**.
+
+\vspace{0.5em}
+No more manual copy-paste. Advisor asks to change the year range? Re-render once.
+
+## ⚠️ One gotcha
+
+**`quarto render` — not just the *preview* button.**
+
+- The live preview **does not watch data files**.
+- After editing **data**, run **`quarto render`** and open the result.
+
+# For your work
+
+## Students: a pre-formatted thesis
+
+- **Chapter I–V** template, cover page, approval page — to campus guidelines.
+- "BAB I" numbering, **Table 4.1 / Figure 4.2**, TOC/lists/bibliography — automatic.
+- Write the content, swap in your data, hit **Render** → thesis PDF.
+
+## Researchers: reproducible writing & talks
+
+- **Papers & reports**: one source → PDF/Word/HTML; citations via **Zotero**.
+- **Presentations**: **Reveal.js** (interactive HTML) & **Beamer** (PDF) from one file.
+- Collaborate via **Git**; publish to **GitHub Pages** automatically.
+
+## One source, two kinds of slides
+
+```yaml
+format:
+  revealjs: default     # HTML slides (screen/web)
+  beamer:               # PDF slides (projector)
+    aspectratio: 169
+```
+
+```bash
+quarto render slide.qmd --to revealjs   # -> slide.html
+quarto render slide.qmd --to beamer     # -> slide.pdf
+```
+
+*These very slides are made that way — Beamer for PDF, Reveal.js for the web.*
+
+# Get started now
+
+## How to start
+
+1. Install **R + RStudio** (Quarto is included).
+2. `quarto install tinytex` (for PDF).
+3. *(Optional)* Python + `reticulate` for Python examples.
+4. Create `hello.qmd`, hit **Render**. Done.
+
+## Hands-on & resources
+
+- 🧪 **Hands-on tutorial (1 hour):** this workshop site (*Hands-on* menu).
+- 📘 **Book "Quarto untuk Skripsi" (Indonesian):** \newline <https://firmanhadi21.github.io/thesis-with-quarto/>
+- 📑 **Quarto docs:** <https://quarto.org>
+
+## {.center}
+
+\begin{center}
+{\Huge Thank You}\\[0.5em]
+{\large Let's write reproducibly.}
+\end{center}

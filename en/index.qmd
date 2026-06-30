@@ -1,0 +1,61 @@
+---
+title: "Quarto Workshop"
+subtitle: "Write reproducible scientific documents — one source, many outputs"
+lang: en
+toc: false
+---
+
+> 🌐 **Versi Bahasa Indonesia:** [baca dalam Bahasa Indonesia](../index.qmd)
+
+Welcome! This workshop introduces **[Quarto](https://quarto.org)** — a scientific
+publishing system that unites **prose + code + data** in a single file and renders to
+**PDF, HTML, Word, and slides** from one source.
+
+## Who is this for?
+
+::: {.grid}
+::: {.g-col-12 .g-col-md-6}
+### 🎓 Students
+Writing a quantitative **thesis/dissertation**: data analysis, tables, figures,
+citations, and a campus-formatted PDF — without copy-pasting from SPSS/Excel into Word.
+:::
+::: {.g-col-12 .g-col-md-6}
+### 🔬 Lecturers & Researchers
+Producing **reproducible papers, reports, and presentations**. Data changed? Just
+re-render — numbers, tables, figures, and slides update automatically.
+:::
+:::
+
+## The problem we solve
+
+| The old way (Word + SPSS/Excel) | With Quarto |
+|---|---|
+| Numbers copied by hand → typos | Numbers appear **automatically** from code |
+| Table/figure numbering breaks on insert | Numbering & table of contents **automatic** |
+| Revising data = redo analysis + re-paste | Change data → **re-render** once |
+| Manual citations & bibliography | Automatic citations (e.g. APA), via Zotero |
+| Slides rebuilt separately | Slides from the **same data** (Beamer/Reveal.js) |
+
+## The core idea
+
+```
+  .qmd file   ──►  Quarto  ──►  PDF · HTML · Word · Slides
+ (prose +         (run the      (clean, reproducible
+  code + data)     code, weave)   output)
+```
+
+**One source, many outputs.** Change one thing in the data, and **everything** updates.
+That's *reproducibility* — and we'll prove it live today.
+
+## Get started
+
+- 👉 **[Follow the hands-on tutorial](hands-on.qmd)** — step by step, do it yourself.
+- 🖥️ **[Download the slides (PDF/Beamer)](../slides/slides-en.pdf)**
+- 📘 **Full book "Quarto untuk Skripsi" (Indonesian):**
+  <https://firmanhadi21.github.io/thesis-with-quarto/>
+
+::: {.callout-tip}
+## What to install
+**R + RStudio** (RStudio ships with Quarto), **TinyTeX** for PDF, and **optionally
+Python** for the Python examples. Details in the [tutorial](hands-on.qmd#sec-setup).
+:::

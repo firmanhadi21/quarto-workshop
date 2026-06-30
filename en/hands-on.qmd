@@ -1,0 +1,174 @@
+---
+title: "Hands-on: Quarto in 1 Hour"
+subtitle: "From a blank document to a PDF, a chart, and slides — all from your data"
+lang: en
+---
+
+> 🌐 **Versi Bahasa Indonesia:** [baca dalam Bahasa Indonesia](../hands-on.qmd)
+
+::: {.callout-warning}
+## Before the session (install these FIRST)
+Installing R/RStudio/TinyTeX can take ~30–60 minutes, so **do it before the workshop** so
+our hour goes to *practice*, not downloading.
+
+1. **R** — <https://cloud.r-project.org/>
+2. **RStudio Desktop** — <https://posit.co/download/rstudio-desktop/> (ships with **Quarto**)
+3. In the RStudio **Terminal**: `quarto install tinytex`
+4. In the RStudio **Console**: `install.packages(c("rmarkdown","knitr","dplyr","ggplot2"))`
+5. *(Optional, for Python examples)* `pip install jupyter pandas matplotlib` + the `reticulate` package.
+
+Done? Great. In the session we'll just verify with `quarto check`.
+:::
+
+## Agenda (~60 min)
+
+| Time | Activity |
+|---|---|
+| ⏱️ 5′ | **0.** Check your setup |
+| ⏱️ 10′ | **1.** Your first document (HTML + PDF) |
+| ⏱️ 15′ | **2.** Prose + code + data |
+| ⏱️ 10′ | **3.** The *reproducible* payoff (change the data) |
+| ⏱️ 10′ | **4.** Slides from the same source |
+| ⏱️ 10′ | **5.** Q&A & next steps |
+
+Download the sample data: **`data/data_kemiskinan_jateng.csv`** (from the workshop repo).
+Put it in your working folder under a `data/` subfolder.
+
+---
+
+## ⏱️ 0 · Check your setup (5′)
+
+Create a new working folder, open it in RStudio, then in the **Terminal**:
+
+```bash
+quarto check
+```
+
+Look for **(✓)** for Quarto and LaTeX. (If using Python: also for Jupyter.)
+
+## ⏱️ 1 · Your first document (10′)
+
+Create `hello.qmd`:
+
+````markdown
+---
+title: "Hello Quarto"
+format: html
+---
+
+## Welcome
+A normal paragraph: **bold**, *italic*, `code`. A list:
+
+- one
+- two
+````
+
+Click **Render** (or `quarto render hello.qmd`). Then change `format: html` → `format: pdf`
+and render again. **Same source, two outputs.** 🎉
+
+## ⏱️ 2 · Prose + code + data (15′)
+
+The heart of Quarto: code runs at render time and its results flow into the document.
+Create `analysis.qmd` (pick R **or** Python):
+
+::: {.panel-tabset}
+### R
+
+````markdown
+---
+title: "Central Java Poverty"
+format: html
+---
+
+```{{r}}
+library(dplyr); library(ggplot2)
+df <- read.csv("data/data_kemiskinan_jateng.csv")
+df23 <- df[df$tahun == 2023, ]
+```
+
+Mean poverty in 2023 = **`r round(mean(df23$kemiskinan), 2)`%**.
+
+```{{r}}
+df |> group_by(tahun) |> summarise(rata = mean(kemiskinan)) |>
+  ggplot(aes(tahun, rata)) + geom_line() + geom_point() +
+  labs(x = "Year", y = "Poverty (%)")
+```
+````
+
+### Python
+
+````markdown
+---
+title: "Central Java Poverty"
+format: html
+jupyter: python3
+---
+
+```{{python}}
+import pandas as pd, matplotlib.pyplot as plt
+df = pd.read_csv("data/data_kemiskinan_jateng.csv")
+df23 = df[df["tahun"] == 2023]
+print(f"Mean 2023: {df23['kemiskinan'].mean():.2f}%")
+```
+
+```{{python}}
+df.groupby("tahun")["kemiskinan"].mean().plot(marker="o")
+plt.xlabel("Year"); plt.ylabel("Poverty (%)"); plt.show()
+```
+````
+:::
+
+Render. Notice: the **inline number** and the **chart** both come from the data — no copy-paste.
+
+## ⏱️ 3 · The *reproducible* payoff (10′) {#sec-repro}
+
+The "aha" moment:
+
+1. Open `data/data_kemiskinan_jateng.csv`.
+2. Change **Kota Semarang 2023** from `4.58` → `24.58`. **Save.**
+3. **Re-render** `analysis.qmd`.
+
+The mean and the chart change instantly. One data edit → the whole document follows.
+
+::: {.callout-important}
+## Must know: `quarto render`, not just *preview*
+The live preview (on `localhost`) **does not watch data files**. After editing **data**,
+run **`quarto render`** in the Terminal and open the result — or edit-and-save a `.qmd` to
+make the preview refresh. *(This is the most common gotcha.)*
+:::
+
+## ⏱️ 4 · Slides from the same source (10′)
+
+No rewriting needed. Edit the header of `analysis.qmd` to add **two slide formats**:
+
+````markdown
+---
+title: "Central Java Poverty"
+format:
+  revealjs: default     # HTML slides (screen/web)
+  beamer:               # PDF slides (projector)
+    aspectratio: 169
+---
+````
+
+Then:
+
+```bash
+quarto render analysis.qmd --to revealjs   # -> analysis.html
+quarto render analysis.qmd --to beamer     # -> analysis.pdf
+```
+
+Each `##` heading becomes a slide; your chart appears on a slide — still from the same data.
+
+## ⏱️ 5 · Done & next steps (10′)
+
+You just: wrote a document, ran analysis inside it, proved *reproducibility*, and made
+slides — **all from one source**.
+
+Keep going:
+
+- 📘 **Book "Quarto untuk Skripsi"** (complete, Chapter I–V, ready templates; Indonesian) —
+  <https://firmanhadi21.github.io/thesis-with-quarto/>
+- 📦 **Thesis templates (R & Python) + defense slides** — in the book's repo.
+- 📑 **Quarto documentation** — <https://quarto.org/docs/guide/>
+- 🔖 **Citations via Zotero** — <https://quarto.org/docs/authoring/citations.html>

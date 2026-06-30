@@ -1,0 +1,10 @@
+/_site/
+/.quarto/
+*_files/
+**/*.quarto_ipynb
+_freeze/
+.DS_Store
+# slide intermediates (we commit the rendered slides/*.pdf)
+slides/*.tex
+slides/*.html
+slides/*_files/

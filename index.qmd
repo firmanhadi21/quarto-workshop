@@ -1,0 +1,62 @@
+---
+title: "Quarto Workshop"
+subtitle: "Menulis dokumen ilmiah yang *reproducible* — sekali tulis, banyak rupa"
+lang: id
+toc: false
+---
+
+> 🌐 **English version:** [read this in English](en/index.qmd)
+
+Selamat datang! Workshop ini memperkenalkan **[Quarto](https://quarto.org)** — sistem
+penerbitan dokumen ilmiah yang menyatukan **tulisan + kode + data** dalam satu berkas,
+lalu menghasilkan **PDF, HTML, Word, dan slide** dari sumber yang sama.
+
+## Untuk siapa?
+
+::: {.grid}
+::: {.g-col-12 .g-col-md-6}
+### 🎓 Mahasiswa (S1–S3)
+Menyusun **skripsi/tesis/disertasi** kuantitatif: olah data, tabel, grafik, sitasi, dan
+PDF sesuai format kampus — tanpa salin-tempel dari SPSS/Excel ke Word.
+:::
+::: {.g-col-12 .g-col-md-6}
+### 🔬 Dosen & Peneliti
+Membuat **artikel, laporan, dan presentasi** yang dapat diproduksi ulang. Data berubah?
+Cukup *render* ulang — angka, tabel, grafik, dan slide ikut diperbarui otomatis.
+:::
+:::
+
+## Masalah yang kita pecahkan
+
+| Alur lama (Word + SPSS/Excel) | Dengan Quarto |
+|---|---|
+| Angka disalin manual → rawan salah ketik | Angka muncul **otomatis** dari kode |
+| Nomor tabel/gambar kacau saat menyisipkan | Penomoran & daftar isi **otomatis** |
+| Revisi data = ulang olah + salin-tempel | Ganti data → **render ulang** sekali |
+| Sitasi & daftar pustaka manual | Sitasi otomatis (mis. APA), via Zotero |
+| Slide dibuat ulang terpisah | Slide dari **data yang sama** (Beamer/Reveal.js) |
+
+## Inti idenya
+
+```
+  berkas .qmd  ──►  Quarto  ──►  PDF · HTML · Word · Slides
+ (tulisan +        (jalankan      (keluaran rapi,
+  kode + data)      kode, rangkai)  reproducible)
+```
+
+**Satu sumber, banyak keluaran.** Ubah satu hal di data, dan **semua** hasil ikut
+berubah. Itulah *reproducibility* — dan itu yang akan kita buktikan langsung hari ini.
+
+## Mulai
+
+- 👉 **[Ikuti tutorial hands-on](hands-on.qmd)** — langkah demi langkah, bisa langsung
+  Anda praktikkan.
+- 🖥️ **[Unduh slide presentasi (PDF/Beamer)](slides/slides-id.pdf)**
+- 📘 **Buku lengkap "Quarto untuk Skripsi":**
+  <https://firmanhadi21.github.io/thesis-with-quarto/>
+
+::: {.callout-tip}
+## Yang perlu disiapkan
+**R + RStudio** (RStudio sudah membawa Quarto), **TinyTeX** untuk PDF, dan **opsional
+Python** untuk contoh berbahasa Python. Detail di [tutorial](hands-on.qmd#sec-setup).
+:::

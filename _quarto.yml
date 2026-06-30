@@ -1,0 +1,54 @@
+project:
+  type: website
+  output-dir: _site
+  # Hanya render halaman web (ID + EN). Slide Beamer (PDF) dirender terpisah & disertakan
+  # sebagai resource.
+  render:
+    - index.qmd
+    - hands-on.qmd
+    - en/index.qmd
+    - en/hands-on.qmd
+  resources:
+    - slides/slides-id.pdf
+    - slides/slides-en.pdf
+    - data/**
+
+website:
+  title: "Quarto Workshop"
+  description: "Menulis dokumen ilmiah yang reproducible dengan Quarto — untuk mahasiswa & peneliti."
+  page-navigation: true
+  navbar:
+    background: primary
+    search: true
+    left:
+      - href: index.qmd
+        text: "Beranda"
+      - href: hands-on.qmd
+        text: "Hands-on"
+    right:
+      - text: "🌐 Bahasa"
+        menu:
+          - href: index.qmd
+            text: "Bahasa Indonesia"
+          - href: en/index.qmd
+            text: "English"
+      - text: "Slides (PDF)"
+        menu:
+          - href: slides/slides-id.pdf
+            text: "Bahasa Indonesia"
+          - href: slides/slides-en.pdf
+            text: "English"
+      - icon: github
+        href: https://github.com/firmanhadi21/thesis-with-quarto
+        text: "Repo Buku"
+  page-footer:
+    center: "Quarto Workshop · dibuat dengan [Quarto](https://quarto.org)"
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-title: "Di halaman ini"
+    code-copy: true
+    code-overflow: wrap
+    fig-cap-location: bottom

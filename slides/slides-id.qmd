@@ -1,0 +1,158 @@
+---
+title: "Quarto untuk Penulisan Ilmiah"
+subtitle: "Dokumen reproducible untuk mahasiswa & peneliti"
+author: "Workshop · Zoom"
+date: today
+date-format: "D MMMM YYYY"
+lang: id
+engine: knitr
+format:
+  beamer:
+    theme: Madrid
+    aspectratio: 169
+    fig-width: 6
+    fig-height: 3.2
+  revealjs:
+    theme: simple
+    slide-number: true
+    fig-width: 7
+    fig-height: 4
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup
+library(dplyr); library(ggplot2)
+df <- read.csv("../data/data_kemiskinan_jateng.csv")
+df23 <- df[df$tahun == 2023, ]
+```
+
+# Mengapa Quarto?
+
+## Untuk siapa workshop ini?
+
+- 🎓 **Mahasiswa** — skripsi/tesis kuantitatif: data, tabel, grafik, sitasi, PDF format kampus.
+- 🔬 **Dosen & peneliti** — artikel, laporan, dan presentasi yang **reproducible**.
+
+\vspace{1em}
+Satu alat, satu alur kerja — dari analisis sampai dokumen jadi.
+
+## Masalah alur lama
+
+| Word + SPSS/Excel | Dengan Quarto |
+|---|---|
+| Salin angka manual → salah ketik | Angka **otomatis** dari kode |
+| Nomor tabel/gambar kacau | Penomoran & daftar isi **otomatis** |
+| Revisi data = olah & salin ulang | Ganti data → **render ulang** |
+| Sitasi manual | Sitasi otomatis (APA, Zotero) |
+| Slide dibuat terpisah | Slide dari **data yang sama** |
+
+## Apa itu Quarto?
+
+Sistem penerbitan: **tulisan + kode + data** dalam satu berkas `.qmd`.
+
+```
+  .qmd  ──►  Quarto  ──►  PDF · HTML · Word · Slides
+```
+
+- Gratis & sumber terbuka. Mendukung **R** dan **Python**.
+- **Sekali tulis, banyak rupa.**
+
+# Inti: data hidup di dokumen
+
+## Angka & grafik langsung dari data {.fragile}
+
+Rata-rata kemiskinan Jawa Tengah **2023 = `r round(mean(df23$kemiskinan),2)`%**
+(dihitung saat render, bukan diketik).
+
+```{r}
+#| fig-cap: "Tren rata-rata kemiskinan (dari data)"
+df |> group_by(tahun) |> summarise(rata = mean(kemiskinan)) |>
+  ggplot(aes(tahun, rata)) +
+  geom_line(color = "#b03a2e", linewidth = 1) + geom_point(size = 2, color = "#b03a2e") +
+  labs(x = "Tahun", y = "Kemiskinan (%)") + theme_minimal(base_size = 13)
+```
+
+## Peta pun dari data yang sama
+
+```{r}
+#| fig-cap: "Sebaran kemiskinan kabupaten/kota, 2023"
+#| fig-height: 3.0
+library(sf); library(maptiles); library(tidyterra)
+geo <- st_transform(st_read("../data/jateng.geojson", quiet = TRUE), 3857)
+peta <- merge(geo, df23, by = "wilayah", all.x = TRUE)
+latar <- get_tiles(peta, provider = "OpenStreetMap", zoom = 8, crop = TRUE)
+ggplot() + geom_spatraster_rgb(data = latar) +
+  geom_sf(data = peta, aes(fill = kemiskinan), color = "white", linewidth = 0.1, alpha = 0.85) +
+  scale_fill_distiller(palette = "OrRd", direction = 1, name = "%") + theme_void()
+```
+
+## Kekuatan utama: *reproducible* {.fragile}
+
+> **Ubah satu angka di data → seluruh dokumen ikut berubah:**
+> angka di kalimat, tabel, grafik, **peta**, bahkan **slide**.
+
+\vspace{0.5em}
+Tidak ada lagi salin-tempel manual. Dosen minta ganti rentang tahun? *Render* ulang sekali.
+
+## ⚠️ Satu jebakan
+
+**`quarto render` — bukan sekadar tombol *preview*.**
+
+- Pratinjau langsung (*live preview*) **tidak memantau berkas data**.
+- Setelah mengubah **data**, jalankan **`quarto render`** lalu buka hasilnya.
+
+# Untuk pekerjaan Anda
+
+## Mahasiswa: skripsi siap format
+
+- Templat **BAB I–V**, sampul, halaman pengesahan — sesuai pedoman kampus.
+- Penomoran "BAB I", **Tabel 4.1 / Gambar 4.2**, daftar isi/tabel/gambar/pustaka — otomatis.
+- Tulis isi, ganti data Anda, tekan **Render** → PDF skripsi.
+
+## Peneliti: tulisan & presentasi reproducible
+
+- **Artikel & laporan**: satu sumber → PDF/Word/HTML; sitasi via **Zotero**.
+- **Presentasi**: **Reveal.js** (HTML interaktif) & **Beamer** (PDF) dari berkas yang sama.
+- Kolaborasi via **Git**; terbit ke **GitHub Pages** otomatis.
+
+## Satu sumber, dua jenis slide
+
+```yaml
+format:
+  revealjs: default     # slide HTML (layar/web)
+  beamer:               # slide PDF (proyektor)
+    aspectratio: 169
+```
+
+```bash
+quarto render slide.qmd --to revealjs   # -> slide.html
+quarto render slide.qmd --to beamer     # -> slide.pdf
+```
+
+*Slide ini sendiri dibuat begitu — Beamer untuk PDF, Reveal.js untuk web.*
+
+# Mulai sekarang
+
+## Cara memulai
+
+1. Pasang **R + RStudio** (Quarto sudah termasuk).
+2. `quarto install tinytex` (untuk PDF).
+3. *(Opsional)* Python + `reticulate` untuk contoh Python.
+4. Buat `halo.qmd`, tekan **Render**. Selesai.
+
+## Praktik & sumber
+
+- 🧪 **Tutorial hands-on (1 jam):** situs workshop ini (menu *Hands-on*).
+- 📘 **Buku "Quarto untuk Skripsi":** \newline <https://firmanhadi21.github.io/thesis-with-quarto/>
+- 📑 **Dokumentasi Quarto:** <https://quarto.org>
+
+## {.center}
+
+\begin{center}
+{\Huge Terima Kasih}\\[0.5em]
+{\large Mari menulis yang reproducible.}
+\end{center}
