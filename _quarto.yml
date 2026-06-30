@@ -1,13 +1,13 @@
 project:
   type: website
   output-dir: _site
-  # Hanya render halaman web (ID + EN). Slide Beamer (PDF) dirender terpisah & disertakan
-  # sebagai resource.
   render:
     - index.qmd
     - hands-on.qmd
+    - analisis.qmd
     - en/index.qmd
     - en/hands-on.qmd
+    - en/analisis.qmd
   resources:
     - slides/slides-id.pdf
     - slides/slides-en.pdf
@@ -25,6 +25,8 @@ website:
         text: "Beranda"
       - href: hands-on.qmd
         text: "Hands-on"
+      - href: analisis.qmd
+        text: "Analisis Data"
     right:
       - text: "🌐 Bahasa"
         menu:
@@ -52,3 +54,10 @@ format:
     code-copy: true
     code-overflow: wrap
     fig-cap-location: bottom
+
+# Halaman Analisis menjalankan kode (R + Python); hasilnya dibekukan (freeze) agar
+# CI cukup merakit hasil tanpa mengeksekusi ulang.
+execute:
+  freeze: auto
+
+lang: id

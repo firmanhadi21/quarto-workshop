@@ -50,6 +50,8 @@ That's *reproducibility* — and we'll prove it live today.
 ## Get started
 
 - 👉 **[Follow the hands-on tutorial](hands-on.qmd)** — step by step, do it yourself.
+- 📊 **[Data Analysis](analisis.qmd)** — descriptive statistics, plotting, linear
+  regression, and geostatistics (live R & Python code).
 - 🖥️ **[Download the slides (PDF/Beamer)](../slides/slides-en.pdf)**
 - 📘 **Full book "Quarto untuk Skripsi" (Indonesian):**
   <https://firmanhadi21.github.io/thesis-with-quarto/>

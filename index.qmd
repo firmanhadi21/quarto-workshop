@@ -51,6 +51,8 @@ berubah. Itulah *reproducibility* — dan itu yang akan kita buktikan langsung h
 
 - 👉 **[Ikuti tutorial hands-on](hands-on.qmd)** — langkah demi langkah, bisa langsung
   Anda praktikkan.
+- 📊 **[Analisis Data](analisis.qmd)** — statistik deskriptif, plotting, regresi linear,
+  dan geostatistik (kode R & Python yang berjalan).
 - 🖥️ **[Unduh slide presentasi (PDF/Beamer)](slides/slides-id.pdf)**
 - 📘 **Buku lengkap "Quarto untuk Skripsi":**
   <https://firmanhadi21.github.io/thesis-with-quarto/>

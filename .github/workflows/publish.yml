@@ -15,11 +15,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # analisis.qmd memakai mesin knitr (R). Hasilnya dibekukan (_freeze/), jadi CI
+      # TIDAK menjalankan kode analisis — tapi knitr tetap perlu R + knitr/rmarkdown
+      # untuk merakit keluaran beku.
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - name: Install knitr + rmarkdown
+        run: Rscript -e 'install.packages(c("knitr","rmarkdown"))'
+
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
 
-      # Halaman web tidak mengeksekusi kode (blok kode hanya ditampilkan),
-      # jadi tidak perlu R/Python di CI — cukup Quarto.
       - name: Render website
         run: quarto render
 

@@ -2,9 +2,10 @@
 /.quarto/
 *_files/
 **/*.quarto_ipynb
-_freeze/
 .DS_Store
 # slide intermediates (we commit the rendered slides/*.pdf)
 slides/*.tex
 slides/*.html
 slides/*_files/
+# _freeze/ IS committed on purpose: it holds the executed results of analisis.qmd
+# so GitHub Actions can render the site WITHOUT running R/Python analysis code.

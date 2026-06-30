@@ -1,0 +1,192 @@
+---
+title: "Analisis Data dengan Quarto"
+subtitle: "Statistik deskriptif · plotting · regresi linear · geostatistik"
+lang: id
+engine: knitr
+execute:
+  warning: false
+  message: false
+---
+
+> 🌐 **English version:** [read this in English](en/analisis.qmd)
+
+Halaman ini menunjukkan analisis nyata — **dijalankan langsung dari data** — untuk **R**
+dan **Python**. Studi kasus: tingkat kemiskinan 35 kabupaten/kota di Jawa Tengah
+(`data/data_kemiskinan_jateng.csv`). Salin kodenya dan jalankan di komputer Anda.
+
+```{r}
+#| label: load-r
+library(dplyr); library(ggplot2); library(knitr)
+df <- read.csv("data/data_kemiskinan_jateng.csv")
+df23 <- df[df$tahun == 2023, ]
+```
+
+## 1. Statistik deskriptif
+
+Ringkasan sebaran variabel: pemusatan (rata-rata, median) dan keragaman (simpangan baku,
+rentang).
+
+::: {.panel-tabset}
+### R
+```{r}
+#| label: desc-r
+vars <- c("kemiskinan", "pdrb_kapita", "inflasi", "ipm")
+ringkas <- data.frame(
+  Variabel = vars,
+  Rerata = sapply(df23[vars], mean), Median = sapply(df23[vars], median),
+  SB = sapply(df23[vars], sd),
+  Min = sapply(df23[vars], min), Maks = sapply(df23[vars], max))
+kable(ringkas, digits = 2, row.names = FALSE)
+```
+### Python
+```{python}
+#| label: desc-py
+import pandas as pd
+df = pd.read_csv("data/data_kemiskinan_jateng.csv")
+df23 = df[df["tahun"] == 2023]
+df23[["kemiskinan","pdrb_kapita","inflasi","ipm"]].describe().round(2)
+```
+:::
+
+## 2. Plotting
+
+Visualisasi membantu memahami **sebaran** (histogram) dan **hubungan** (diagram pencar).
+
+::: {.panel-tabset}
+### R
+```{r}
+#| label: plot-r
+#| fig-cap: "Sebaran kemiskinan (histogram) & hubungannya dengan PDRB per kapita, 2023"
+#| fig-width: 8
+#| fig-height: 3.2
+par(mfrow = c(1, 2))
+hist(df23$kemiskinan, breaks = 10, col = "#b03a2e", border = "white",
+     main = "", xlab = "Kemiskinan (%)", ylab = "Jumlah daerah")
+plot(df23$pdrb_kapita, df23$kemiskinan, pch = 19, col = "#2166ac",
+     xlab = "PDRB per kapita (juta)", ylab = "Kemiskinan (%)")
+abline(lm(kemiskinan ~ pdrb_kapita, data = df23), col = "#b03a2e", lwd = 2)
+```
+### Python
+```{python}
+#| label: plot-py
+#| fig-cap: "Sebaran kemiskinan (histogram) & hubungannya dengan PDRB per kapita, 2023"
+#| fig-width: 8
+#| fig-height: 3.2
+import numpy as np, matplotlib.pyplot as plt
+fig, ax = plt.subplots(1, 2, figsize=(8, 3.2))
+ax[0].hist(df23["kemiskinan"], bins=10, color="#b03a2e", edgecolor="white")
+ax[0].set_xlabel("Kemiskinan (%)"); ax[0].set_ylabel("Jumlah daerah")
+ax[1].scatter(df23["pdrb_kapita"], df23["kemiskinan"], color="#2166ac")
+m, b = np.polyfit(df23["pdrb_kapita"], df23["kemiskinan"], 1)
+ax[1].plot(df23["pdrb_kapita"], m*df23["pdrb_kapita"] + b, color="#b03a2e")
+ax[1].set_xlabel("PDRB per kapita (juta)"); ax[1].set_ylabel("Kemiskinan (%)")
+plt.tight_layout(); plt.show()
+```
+:::
+
+## 3. Regresi linear berganda
+
+Memodelkan kemiskinan sebagai fungsi beberapa variabel bebas. Perhatikan **tanda
+koefisien** (arah pengaruh), **p-value** (signifikansi), dan **R²** (daya jelas model).
+Pakai **data panel 2019–2023** (175 observasi).
+
+::: {.panel-tabset}
+### R
+```{r}
+#| label: reg-r
+model <- lm(kemiskinan ~ pdrb_kapita + inflasi + ipm + pengangguran, data = df)
+koef <- summary(model)$coefficients[, c("Estimate", "Pr(>|t|)")]
+rownames(koef) <- c("Konstanta","PDRB per kapita","Inflasi","IPM","Pengangguran")
+kable(koef, col.names = c("Koefisien", "p-value"), digits = 3)
+cat(sprintf("R-squared = %.3f", summary(model)$r.squared))
+```
+### Python
+```{python}
+#| label: reg-py
+import statsmodels.formula.api as smf
+model = smf.ols("kemiskinan ~ pdrb_kapita + inflasi + ipm + pengangguran", data=df).fit()
+koef = pd.DataFrame({"Koefisien": model.params, "p-value": model.pvalues}).round(3)
+koef.index = ["Konstanta","PDRB per kapita","Inflasi","IPM","Pengangguran"]
+print(koef)
+print(f"R-squared = {model.rsquared:.3f}")
+```
+:::
+
+**Membaca hasil:** **tanda koefisien** = arah pengaruh (mis. koefisien negatif pada IPM ⇒
+makin tinggi IPM, makin rendah kemiskinan); **p-value < 0,05** ⇒ pengaruh signifikan; **R²**
+= proporsi variasi yang dijelaskan model. *R² yang rendah pada model sederhana ini justru
+wajar* — data panel sering butuh **efek tetap** (*fixed effects*) atau **regresi spasial**
+(lihat buku). Itulah gunanya *reproducible*: ganti model, render ulang, bandingkan.
+
+## 4. Geostatistik
+
+Data spasial punya pesan tambahan: **apakah daerah miskin mengelompok?** Kita petakan
+sebarannya, lalu uji **autokorelasi spasial** dengan **Moran's I**.
+
+### Peta tematik (choropleth) {.unnumbered}
+
+::: {.panel-tabset}
+### R
+```{r}
+#| label: map-r
+#| fig-cap: "Sebaran kemiskinan kabupaten/kota, 2023 (R)"
+#| fig-width: 8
+#| fig-height: 4.2
+library(sf); library(maptiles); library(tidyterra)
+geo <- st_transform(st_read("data/jateng.geojson", quiet = TRUE), 3857)
+peta <- merge(geo, df23, by = "wilayah", all.x = TRUE)
+latar <- get_tiles(peta, provider = "OpenStreetMap", zoom = 8, crop = TRUE)
+ggplot() + geom_spatraster_rgb(data = latar) +
+  geom_sf(data = peta, aes(fill = kemiskinan), color = "white", linewidth = 0.1, alpha = 0.85) +
+  scale_fill_distiller(palette = "OrRd", direction = 1, name = "Kemiskinan (%)") + theme_void()
+```
+### Python
+```{python}
+#| label: map-py
+#| fig-cap: "Sebaran kemiskinan kabupaten/kota, 2023 (Python)"
+#| fig-width: 8
+#| fig-height: 4.2
+import geopandas as gpd, contextily as ctx
+g = gpd.read_file("data/jateng.geojson")
+pmap = g.merge(df23, on="wilayah", how="left").to_crs(3857)
+ax = pmap.plot(column="kemiskinan", cmap="OrRd", legend=True, alpha=0.85,
+               edgecolor="white", linewidth=0.3, figsize=(8, 4.2))
+ctx.add_basemap(ax, source=ctx.providers.OpenStreetMap.Mapnik)
+ax.set_axis_off(); plt.show()
+```
+:::
+
+### Autokorelasi spasial — Moran's I {.unnumbered}
+
+Moran's I positif & signifikan ⇒ daerah dengan nilai serupa **berdekatan** (mengelompok).
+
+::: {.panel-tabset}
+### R
+```{r}
+#| label: moran-r
+library(spdep)
+nb <- poly2nb(peta)                 # ketetanggaan (queen contiguity)
+w  <- nb2listw(nb, style = "W")     # bobot spasial
+mt <- moran.test(peta$kemiskinan, w)
+cat(sprintf("Moran's I = %.3f (p = %.4f)", mt$estimate[1], mt$p.value))
+```
+### Python
+```{python}
+#| label: moran-py
+from libpysal.weights import Queen
+from esda.moran import Moran
+w = Queen.from_dataframe(pmap, use_index=False); w.transform = "r"
+mi = Moran(pmap["kemiskinan"].values, w)
+print(f"Moran's I = {mi.I:.3f} (p = {mi.p_sim:.4f})")
+```
+:::
+
+**Tafsir:** bila Moran's I positif & signifikan, kemiskinan **mengelompok secara spasial**
+— ada "kantong" kemiskinan. Lanjutkan dengan **LISA** (klaster lokal) dan **regresi
+spasial** bila perlu (lihat buku, bab *Statistik Spasial*).
+
+## Selanjutnya
+
+- 📘 **Buku "Quarto untuk Skripsi"** — uji asumsi klasik, data panel, LISA, regresi spasial:
+  <https://firmanhadi21.github.io/thesis-with-quarto/>
+- 🧪 Kembali ke **[tutorial hands-on](hands-on.qmd)**.
