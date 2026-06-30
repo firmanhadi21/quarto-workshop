@@ -5,12 +5,15 @@ project:
     - index.qmd
     - hands-on.qmd
     - analisis.qmd
+    - skripsi.qmd
     - en/index.qmd
     - en/hands-on.qmd
     - en/analisis.qmd
+    - en/skripsi.qmd
   resources:
     - slides/slides-id.pdf
     - slides/slides-en.pdf
+    - skripsi/contoh-skripsi.pdf
     - data/**
 
 website:
@@ -27,6 +30,8 @@ website:
         text: "Hands-on"
       - href: analisis.qmd
         text: "Analisis Data"
+      - href: skripsi.qmd
+        text: "Skripsi"
     right:
       - text: "🌐 Bahasa"
         menu:

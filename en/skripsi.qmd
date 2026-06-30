@@ -1,0 +1,79 @@
+---
+title: "A Thesis (Skripsi) with Quarto"
+subtitle: "One project → a thesis PDF in your campus format (FEB UNDIP)"
+lang: en
+---
+
+> 🌐 **Versi Bahasa Indonesia:** [baca dalam Bahasa Indonesia](../skripsi.qmd)
+
+Quarto isn't just for plain documents — it can produce a **full thesis** with a **print
+layout exactly like a real skripsi**: cover page, approval page, Chapters I–V, automatic
+numbering, lists of contents/tables/figures, and a bibliography. You write the content and
+analysis; Quarto handles the formatting.
+
+## The result: a true thesis layout {#sec-layout}
+
+The example below is rendered from the thesis template (Central Java poverty case study) —
+**its print layout matches a real skripsi**:
+
+::: {layout-ncol=2}
+![Cover page — title, "SKRIPSI", FEB Universitas Diponegoro, name & student ID](../img/skripsi-cover.png){.border}
+
+![Numbered chapter + automatic **Table 5.1** & coloured cross-references](../img/skripsi-bab.png){.border}
+:::
+
+Figures, maps, and statistical tests appear in thesis layout too — all **computed from the
+data**, never pasted by hand:
+
+![Figure 5.1 (map with OSM basemap) + classical-assumption tests, in thesis layout](../img/skripsi-peta.png){.border width="62%" fig-align="center"}
+
+## What Quarto handles automatically
+
+- **Front matter**: cover, approval page, abstract, preface.
+- **Numbering**: "Chapter I–V", **Table 5.1 / Figure 5.1**, equations — with clickable
+  **cross-references**.
+- **Automatic lists**: table of contents, list of tables, list of figures.
+- **Citations & bibliography**: APA (or other) styles, linked to **Zotero/`.bib`**.
+- **Analysis results**: descriptive tables, charts, maps, assumption tests, regression —
+  straight from code + data (see the **[Data Analysis](analisis.qmd)** page).
+
+## Thesis project structure
+
+```
+thesis/
+├── _quarto.yml          # "book" project: chapter order, PDF/Word format
+├── index.qmd            # title page / abstract
+├── bab/
+│   ├── 01-pendahuluan.qmd      # Chapter I (Introduction)
+│   ├── 02-tinjauan-pustaka.qmd # Chapter II (Literature)
+│   ├── 03-metode.qmd           # Chapter III (Methods)
+│   ├── 04-hasil.qmd            # Chapter IV/V (Results & Discussion)
+│   └── 05-penutup.qmd
+├── data/                # your data (.csv, .geojson)
+├── tex/preamble.tex     # LaTeX style (margins, Times font, chapter numbering)
+└── referensi.bib        # references (export from Zotero)
+```
+
+## How to use it
+
+1. **Grab a ready template** (R or Python) — see *Downloads* below.
+2. **Write each chapter** in `bab/*.qmd` (plain Markdown + code blocks for analysis).
+3. **Swap in your data** under `data/`.
+4. **Render** → `thesis PDF`. (For Word: `--to docx`.)
+5. **Data/variables change?** Re-render — tables, charts, maps, numbers, and the
+   bibliography **update automatically**.
+
+::: {.callout-tip}
+## Match your campus format
+Margins, font (e.g. **Times New Roman 12pt**), 1.5 line spacing, and numbering live in
+`tex/preamble.tex` and `_quarto.yml` — set them once, applied across the whole thesis.
+:::
+
+## Downloads & templates
+
+- 📄 **[Download the example thesis (PDF)](../skripsi/contoh-skripsi.pdf)** — 35 pages,
+  rendered from the template.
+- 📦 **Thesis templates (R & Python)** + defense slides — in the book's repo:
+  <https://github.com/firmanhadi21/thesis-with-quarto>
+- 📘 **Full book "Quarto untuk Skripsi"** (chapter-by-chapter guide; Indonesian):
+  <https://firmanhadi21.github.io/thesis-with-quarto/>

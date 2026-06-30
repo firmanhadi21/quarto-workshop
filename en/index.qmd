@@ -52,6 +52,8 @@ That's *reproducibility* — and we'll prove it live today.
 - 👉 **[Follow the hands-on tutorial](hands-on.qmd)** — step by step, do it yourself.
 - 📊 **[Data Analysis](analisis.qmd)** — descriptive statistics, plotting, linear
   regression, and geostatistics (live R & Python code).
+- 🎓 **[A Thesis with Quarto](skripsi.qmd)** — a thesis PDF in campus format (cover,
+  Chapters I–V, automatic numbering & bibliography).
 - 🖥️ **[Download the slides (PDF/Beamer)](../slides/slides-en.pdf)**
 - 📘 **Full book "Quarto untuk Skripsi" (Indonesian):**
   <https://firmanhadi21.github.io/thesis-with-quarto/>

@@ -53,6 +53,8 @@ berubah. Itulah *reproducibility* — dan itu yang akan kita buktikan langsung h
   Anda praktikkan.
 - 📊 **[Analisis Data](analisis.qmd)** — statistik deskriptif, plotting, regresi linear,
   dan geostatistik (kode R & Python yang berjalan).
+- 🎓 **[Skripsi dengan Quarto](skripsi.qmd)** — PDF skripsi sesuai format kampus (sampul,
+  BAB I–V, penomoran & daftar pustaka otomatis).
 - 🖥️ **[Unduh slide presentasi (PDF/Beamer)](slides/slides-id.pdf)**
 - 📘 **Buku lengkap "Quarto untuk Skripsi":**
   <https://firmanhadi21.github.io/thesis-with-quarto/>
