@@ -1,0 +1,184 @@
+[
+  {
+    "objectID": "en/hands-on.html",
+    "href": "en/hands-on.html",
+    "title": "Hands-on: Quarto in 1 Hour",
+    "section": "",
+    "text": "🌐 Versi Bahasa Indonesia: baca dalam Bahasa Indonesia"
+  },
+  {
+    "objectID": "en/hands-on.html#agenda-60-min",
+    "href": "en/hands-on.html#agenda-60-min",
+    "title": "Hands-on: Quarto in 1 Hour",
+    "section": "Agenda (~60 min)",
+    "text": "Agenda (~60 min)\n\n\n\nTime\nActivity\n\n\n\n\n⏱️ 5′\n0. Check your setup\n\n\n⏱️ 10′\n1. Your first document (HTML + PDF)\n\n\n⏱️ 15′\n2. Prose + code + data\n\n\n⏱️ 10′\n3. The reproducible payoff (change the data)\n\n\n⏱️ 10′\n4. Slides from the same source\n\n\n⏱️ 10′\n5. Q&A & next steps\n\n\n\nDownload the sample data: data/data_kemiskinan_jateng.csv (from the workshop repo). Put it in your working folder under a data/ subfolder."
+  },
+  {
+    "objectID": "en/hands-on.html#check-your-setup-5",
+    "href": "en/hands-on.html#check-your-setup-5",
+    "title": "Hands-on: Quarto in 1 Hour",
+    "section": "⏱️ 0 · Check your setup (5′)",
+    "text": "⏱️ 0 · Check your setup (5′)\nCreate a new working folder, open it in RStudio, then in the Terminal:\nquarto check\nLook for (✓) for Quarto and LaTeX. (If using Python: also for Jupyter.)"
+  },
+  {
+    "objectID": "en/hands-on.html#your-first-document-10",
+    "href": "en/hands-on.html#your-first-document-10",
+    "title": "Hands-on: Quarto in 1 Hour",
+    "section": "⏱️ 1 · Your first document (10′)",
+    "text": "⏱️ 1 · Your first document (10′)\nCreate hello.qmd:\n---\ntitle: \"Hello Quarto\"\nformat: html\n---\n\n## Welcome\nA normal paragraph: **bold**, *italic*, `code`. A list:\n\n- one\n- two\nClick Render (or quarto render hello.qmd). Then change format: html → format: pdf and render again. Same source, two outputs. 🎉"
+  },
+  {
+    "objectID": "en/hands-on.html#prose-code-data-15",
+    "href": "en/hands-on.html#prose-code-data-15",
+    "title": "Hands-on: Quarto in 1 Hour",
+    "section": "⏱️ 2 · Prose + code + data (15′)",
+    "text": "⏱️ 2 · Prose + code + data (15′)\nThe heart of Quarto: code runs at render time and its results flow into the document. Create analysis.qmd (pick R or Python):\n\nRPython\n\n\n---\ntitle: \"Central Java Poverty\"\nformat: html\n---\n\n```{r}\nlibrary(dplyr); library(ggplot2)\ndf &lt;- read.csv(\"data/data_kemiskinan_jateng.csv\")\ndf23 &lt;- df[df$tahun == 2023, ]\n```\n\nMean poverty in 2023 = **`r round(mean(df23$kemiskinan), 2)`%**.\n\n```{r}\ndf |&gt; group_by(tahun) |&gt; summarise(rata = mean(kemiskinan)) |&gt;\n  ggplot(aes(tahun, rata)) + geom_line() + geom_point() +\n  labs(x = \"Year\", y = \"Poverty (%)\")\n```\n\n\n---\ntitle: \"Central Java Poverty\"\nformat: html\njupyter: python3\n---\n\n```{python}\nimport pandas as pd, matplotlib.pyplot as plt\ndf = pd.read_csv(\"data/data_kemiskinan_jateng.csv\")\ndf23 = df[df[\"tahun\"] == 2023]\nprint(f\"Mean 2023: {df23['kemiskinan'].mean():.2f}%\")\n```\n\n```{python}\ndf.groupby(\"tahun\")[\"kemiskinan\"].mean().plot(marker=\"o\")\nplt.xlabel(\"Year\"); plt.ylabel(\"Poverty (%)\"); plt.show()\n```\n\n\n\nRender. Notice: the inline number and the chart both come from the data — no copy-paste."
+  },
+  {
+    "objectID": "en/hands-on.html#sec-repro",
+    "href": "en/hands-on.html#sec-repro",
+    "title": "Hands-on: Quarto in 1 Hour",
+    "section": "⏱️ 3 · The reproducible payoff (10′)",
+    "text": "⏱️ 3 · The reproducible payoff (10′)\nThe “aha” moment:\n\nOpen data/data_kemiskinan_jateng.csv.\nChange Kota Semarang 2023 from 4.58 → 24.58. Save.\nRe-render analysis.qmd.\n\nThe mean and the chart change instantly. One data edit → the whole document follows.\n\n\n\n\n\n\nImportantMust know: quarto render, not just preview\n\n\n\nThe live preview (on localhost) does not watch data files. After editing data, run quarto render in the Terminal and open the result — or edit-and-save a .qmd to make the preview refresh. (This is the most common gotcha.)"
+  },
+  {
+    "objectID": "en/hands-on.html#slides-from-the-same-source-10",
+    "href": "en/hands-on.html#slides-from-the-same-source-10",
+    "title": "Hands-on: Quarto in 1 Hour",
+    "section": "⏱️ 4 · Slides from the same source (10′)",
+    "text": "⏱️ 4 · Slides from the same source (10′)\nNo rewriting needed. Edit the header of analysis.qmd to add two slide formats:\n---\ntitle: \"Central Java Poverty\"\nformat:\n  revealjs: default     # HTML slides (screen/web)\n  beamer:               # PDF slides (projector)\n    aspectratio: 169\n---\nThen:\nquarto render analysis.qmd --to revealjs   # -&gt; analysis.html\nquarto render analysis.qmd --to beamer     # -&gt; analysis.pdf\nEach ## heading becomes a slide; your chart appears on a slide — still from the same data."
+  },
+  {
+    "objectID": "en/hands-on.html#done-next-steps-10",
+    "href": "en/hands-on.html#done-next-steps-10",
+    "title": "Hands-on: Quarto in 1 Hour",
+    "section": "⏱️ 5 · Done & next steps (10′)",
+    "text": "⏱️ 5 · Done & next steps (10′)\nYou just: wrote a document, ran analysis inside it, proved reproducibility, and made slides — all from one source.\nKeep going:\n\n📘 Book “Quarto untuk Skripsi” (complete, Chapter I–V, ready templates; Indonesian) — https://firmanhadi21.github.io/thesis-with-quarto/\n📦 Thesis templates (R & Python) + defense slides — in the book’s repo.\n📑 Quarto documentation — https://quarto.org/docs/guide/\n🔖 Citations via Zotero — https://quarto.org/docs/authoring/citations.html"
+  },
+  {
+    "objectID": "hands-on.html",
+    "href": "hands-on.html",
+    "title": "Hands-on: Quarto dalam 1 Jam",
+    "section": "",
+    "text": "🌐 English version: read this in English"
+  },
+  {
+    "objectID": "hands-on.html#agenda-60-menit",
+    "href": "hands-on.html#agenda-60-menit",
+    "title": "Hands-on: Quarto dalam 1 Jam",
+    "section": "Agenda (±60 menit)",
+    "text": "Agenda (±60 menit)\n\n\n\nWaktu\nKegiatan\n\n\n\n\n⏱️ 5′\n0. Cek kesiapan\n\n\n⏱️ 10′\n1. Dokumen pertama (HTML + PDF)\n\n\n⏱️ 15′\n2. Tulisan + kode + data\n\n\n⏱️ 10′\n3. Bukti reproducible (ubah data)\n\n\n⏱️ 10′\n4. Slide dari data yang sama\n\n\n⏱️ 10′\n5. Tanya jawab & langkah lanjut\n\n\n\nUnduh data contoh: data/data_kemiskinan_jateng.csv (dari repositori workshop). Taruh di folder kerja Anda, di dalam subfolder data/."
+  },
+  {
+    "objectID": "hands-on.html#cek-kesiapan-5",
+    "href": "hands-on.html#cek-kesiapan-5",
+    "title": "Hands-on: Quarto dalam 1 Jam",
+    "section": "⏱️ 0 · Cek kesiapan (5′)",
+    "text": "⏱️ 0 · Cek kesiapan (5′)\nBuat folder kerja baru, buka di RStudio, lalu di Terminal:\nquarto check\nCari (✓) untuk Quarto dan LaTeX. (Bila pakai Python: juga untuk Jupyter.)"
+  },
+  {
+    "objectID": "hands-on.html#dokumen-pertama-10",
+    "href": "hands-on.html#dokumen-pertama-10",
+    "title": "Hands-on: Quarto dalam 1 Jam",
+    "section": "⏱️ 1 · Dokumen pertama (10′)",
+    "text": "⏱️ 1 · Dokumen pertama (10′)\nBuat halo.qmd:\n---\ntitle: \"Halo Quarto\"\nformat: html\n---\n\n## Selamat datang\nParagraf biasa: **tebal**, *miring*, `kode`. Daftar:\n\n- satu\n- dua\nTekan Render (atau quarto render halo.qmd). Lalu ganti format: html → format: pdf, render lagi. Isi sama, dua keluaran. 🎉"
+  },
+  {
+    "objectID": "hands-on.html#tulisan-kode-data-15",
+    "href": "hands-on.html#tulisan-kode-data-15",
+    "title": "Hands-on: Quarto dalam 1 Jam",
+    "section": "⏱️ 2 · Tulisan + kode + data (15′)",
+    "text": "⏱️ 2 · Tulisan + kode + data (15′)\nInti Quarto: kode dijalankan saat render; hasilnya masuk ke dokumen. Buat analisis.qmd (pilih R atau Python):\n\nRPython\n\n\n---\ntitle: \"Kemiskinan Jawa Tengah\"\nformat: html\n---\n\n```{r}\nlibrary(dplyr); library(ggplot2)\ndf &lt;- read.csv(\"data/data_kemiskinan_jateng.csv\")\ndf23 &lt;- df[df$tahun == 2023, ]\n```\n\nRata-rata kemiskinan 2023 = **`r round(mean(df23$kemiskinan), 2)`%**.\n\n```{r}\ndf |&gt; group_by(tahun) |&gt; summarise(rata = mean(kemiskinan)) |&gt;\n  ggplot(aes(tahun, rata)) + geom_line() + geom_point() +\n  labs(x = \"Tahun\", y = \"Kemiskinan (%)\")\n```\n\n\n---\ntitle: \"Kemiskinan Jawa Tengah\"\nformat: html\njupyter: python3\n---\n\n```{python}\nimport pandas as pd, matplotlib.pyplot as plt\ndf = pd.read_csv(\"data/data_kemiskinan_jateng.csv\")\ndf23 = df[df[\"tahun\"] == 2023]\nprint(f\"Rata-rata 2023: {df23['kemiskinan'].mean():.2f}%\")\n```\n\n```{python}\ndf.groupby(\"tahun\")[\"kemiskinan\"].mean().plot(marker=\"o\")\nplt.xlabel(\"Tahun\"); plt.ylabel(\"Kemiskinan (%)\"); plt.show()\n```\n\n\n\nRender. Perhatikan: angka di kalimat dan grafik sama-sama dari data — tanpa salin-tempel."
+  },
+  {
+    "objectID": "hands-on.html#sec-repro",
+    "href": "hands-on.html#sec-repro",
+    "title": "Hands-on: Quarto dalam 1 Jam",
+    "section": "⏱️ 3 · Bukti reproducible (10′)",
+    "text": "⏱️ 3 · Bukti reproducible (10′)\nMomen “aha”:\n\nBuka data/data_kemiskinan_jateng.csv.\nUbah Kota Semarang 2023 dari 4.58 → 24.58. Simpan.\nRender ulang analisis.qmd.\n\nAngka rata-rata dan grafik langsung berubah. Satu edit data → seluruh dokumen ikut.\n\n\n\n\n\n\nPentingWajib tahu: quarto render, bukan sekadar preview\n\n\n\nPratinjau langsung (live preview di localhost) tidak memantau berkas data. Setelah mengubah data, jalankan quarto render di Terminal lalu buka hasilnya — atau ubah-simpan sebuah .qmd agar pratinjau menyegarkan. (Ini jebakan paling umum.)"
+  },
+  {
+    "objectID": "hands-on.html#slide-dari-data-yang-sama-10",
+    "href": "hands-on.html#slide-dari-data-yang-sama-10",
+    "title": "Hands-on: Quarto dalam 1 Jam",
+    "section": "⏱️ 4 · Slide dari data yang sama (10′)",
+    "text": "⏱️ 4 · Slide dari data yang sama (10′)\nTak perlu menulis ulang. Ubah header analisis.qmd agar punya dua format slide:\n---\ntitle: \"Kemiskinan Jawa Tengah\"\nformat:\n  revealjs: default     # slide HTML (layar/web)\n  beamer:               # slide PDF (proyektor)\n    aspectratio: 169\n---\nLalu:\nquarto render analisis.qmd --to revealjs   # -&gt; analisis.html\nquarto render analisis.qmd --to beamer     # -&gt; analisis.pdf\nJudul ## menjadi satu slide; grafik tadi muncul di slide — tetap dari data yang sama."
+  },
+  {
+    "objectID": "hands-on.html#selesai-langkah-lanjut-10",
+    "href": "hands-on.html#selesai-langkah-lanjut-10",
+    "title": "Hands-on: Quarto dalam 1 Jam",
+    "section": "⏱️ 5 · Selesai & langkah lanjut (10′)",
+    "text": "⏱️ 5 · Selesai & langkah lanjut (10′)\nAnda baru saja: menulis dokumen, menjalankan analisis di dalamnya, membuktikan reproducibility, dan membuat slide — semua dari satu sumber.\nLanjutkan:\n\n📘 Buku “Quarto untuk Skripsi” (lengkap, BAB I–V, templat siap pakai) — https://firmanhadi21.github.io/thesis-with-quarto/\n📦 Templat skripsi (R & Python) + slide sidang — di repositori buku.\n📑 Dokumentasi Quarto — https://quarto.org/docs/guide/\n🔖 Sitasi via Zotero — https://quarto.org/docs/authoring/citations.html"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Quarto Workshop",
+    "section": "",
+    "text": "🌐 English version: read this in English\nSelamat datang! Workshop ini memperkenalkan Quarto — sistem penerbitan dokumen ilmiah yang menyatukan tulisan + kode + data dalam satu berkas, lalu menghasilkan PDF, HTML, Word, dan slide dari sumber yang sama."
+  },
+  {
+    "objectID": "index.html#untuk-siapa",
+    "href": "index.html#untuk-siapa",
+    "title": "Quarto Workshop",
+    "section": "Untuk siapa?",
+    "text": "Untuk siapa?\n\n\n🎓 Mahasiswa (S1–S3)\nMenyusun skripsi/tesis/disertasi kuantitatif: olah data, tabel, grafik, sitasi, dan PDF sesuai format kampus — tanpa salin-tempel dari SPSS/Excel ke Word.\n\n\n🔬 Dosen & Peneliti\nMembuat artikel, laporan, dan presentasi yang dapat diproduksi ulang. Data berubah? Cukup render ulang — angka, tabel, grafik, dan slide ikut diperbarui otomatis."
+  },
+  {
+    "objectID": "index.html#masalah-yang-kita-pecahkan",
+    "href": "index.html#masalah-yang-kita-pecahkan",
+    "title": "Quarto Workshop",
+    "section": "Masalah yang kita pecahkan",
+    "text": "Masalah yang kita pecahkan\n\n\n\n\n\n\n\nAlur lama (Word + SPSS/Excel)\nDengan Quarto\n\n\n\n\nAngka disalin manual → rawan salah ketik\nAngka muncul otomatis dari kode\n\n\nNomor tabel/gambar kacau saat menyisipkan\nPenomoran & daftar isi otomatis\n\n\nRevisi data = ulang olah + salin-tempel\nGanti data → render ulang sekali\n\n\nSitasi & daftar pustaka manual\nSitasi otomatis (mis. APA), via Zotero\n\n\nSlide dibuat ulang terpisah\nSlide dari data yang sama (Beamer/Reveal.js)"
+  },
+  {
+    "objectID": "index.html#inti-idenya",
+    "href": "index.html#inti-idenya",
+    "title": "Quarto Workshop",
+    "section": "Inti idenya",
+    "text": "Inti idenya\n  berkas .qmd  ──►  Quarto  ──►  PDF · HTML · Word · Slides\n (tulisan +        (jalankan      (keluaran rapi,\n  kode + data)      kode, rangkai)  reproducible)\nSatu sumber, banyak keluaran. Ubah satu hal di data, dan semua hasil ikut berubah. Itulah reproducibility — dan itu yang akan kita buktikan langsung hari ini."
+  },
+  {
+    "objectID": "index.html#mulai",
+    "href": "index.html#mulai",
+    "title": "Quarto Workshop",
+    "section": "Mulai",
+    "text": "Mulai\n\n👉 Ikuti tutorial hands-on — langkah demi langkah, bisa langsung Anda praktikkan.\n🖥️ Unduh slide presentasi (PDF/Beamer)\n📘 Buku lengkap “Quarto untuk Skripsi”: https://firmanhadi21.github.io/thesis-with-quarto/\n\n\n\n\n\n\n\nTipYang perlu disiapkan\n\n\n\nR + RStudio (RStudio sudah membawa Quarto), TinyTeX untuk PDF, dan opsional Python untuk contoh berbahasa Python. Detail di tutorial."
+  },
+  {
+    "objectID": "en/index.html",
+    "href": "en/index.html",
+    "title": "Quarto Workshop",
+    "section": "",
+    "text": "🌐 Versi Bahasa Indonesia: baca dalam Bahasa Indonesia\nWelcome! This workshop introduces Quarto — a scientific publishing system that unites prose + code + data in a single file and renders to PDF, HTML, Word, and slides from one source."
+  },
+  {
+    "objectID": "en/index.html#who-is-this-for",
+    "href": "en/index.html#who-is-this-for",
+    "title": "Quarto Workshop",
+    "section": "Who is this for?",
+    "text": "Who is this for?\n\n\n🎓 Students\nWriting a quantitative thesis/dissertation: data analysis, tables, figures, citations, and a campus-formatted PDF — without copy-pasting from SPSS/Excel into Word.\n\n\n🔬 Lecturers & Researchers\nProducing reproducible papers, reports, and presentations. Data changed? Just re-render — numbers, tables, figures, and slides update automatically."
+  },
+  {
+    "objectID": "en/index.html#the-problem-we-solve",
+    "href": "en/index.html#the-problem-we-solve",
+    "title": "Quarto Workshop",
+    "section": "The problem we solve",
+    "text": "The problem we solve\n\n\n\n\n\n\n\nThe old way (Word + SPSS/Excel)\nWith Quarto\n\n\n\n\nNumbers copied by hand → typos\nNumbers appear automatically from code\n\n\nTable/figure numbering breaks on insert\nNumbering & table of contents automatic\n\n\nRevising data = redo analysis + re-paste\nChange data → re-render once\n\n\nManual citations & bibliography\nAutomatic citations (e.g. APA), via Zotero\n\n\nSlides rebuilt separately\nSlides from the same data (Beamer/Reveal.js)"
+  },
+  {
+    "objectID": "en/index.html#the-core-idea",
+    "href": "en/index.html#the-core-idea",
+    "title": "Quarto Workshop",
+    "section": "The core idea",
+    "text": "The core idea\n  .qmd file   ──►  Quarto  ──►  PDF · HTML · Word · Slides\n (prose +         (run the      (clean, reproducible\n  code + data)     code, weave)   output)\nOne source, many outputs. Change one thing in the data, and everything updates. That’s reproducibility — and we’ll prove it live today."
+  },
+  {
+    "objectID": "en/index.html#get-started",
+    "href": "en/index.html#get-started",
+    "title": "Quarto Workshop",
+    "section": "Get started",
+    "text": "Get started\n\n👉 Follow the hands-on tutorial — step by step, do it yourself.\n🖥️ Download the slides (PDF/Beamer)\n📘 Full book “Quarto untuk Skripsi” (Indonesian): https://firmanhadi21.github.io/thesis-with-quarto/\n\n\n\n\n\n\n\nTipWhat to install\n\n\n\nR + RStudio (RStudio ships with Quarto), TinyTeX for PDF, and optionally Python for the Python examples. Details in the tutorial."
+  }
+]
