@@ -1,59 +1,80 @@
 [
   {
-    "objectID": "en/hands-on.html",
-    "href": "en/hands-on.html",
-    "title": "Hands-on: Quarto in 1 Hour",
+    "objectID": "en/analisis.html",
+    "href": "en/analisis.html",
+    "title": "Data Analysis with Quarto",
     "section": "",
-    "text": "🌐 Versi Bahasa Indonesia: baca dalam Bahasa Indonesia"
+    "text": "🌐 Versi Bahasa Indonesia: baca dalam Bahasa Indonesia\nThis page shows real analysis — run straight from the data — in both R and Python. Case study: poverty across 35 districts of Central Java (data/data_kemiskinan_jateng.csv). Copy the code and run it on your machine.\nlibrary(dplyr); library(ggplot2); library(knitr)\ndf &lt;- read.csv(\"../data/data_kemiskinan_jateng.csv\")\ndf23 &lt;- df[df$tahun == 2023, ]"
   },
   {
-    "objectID": "en/hands-on.html#agenda-60-min",
-    "href": "en/hands-on.html#agenda-60-min",
-    "title": "Hands-on: Quarto in 1 Hour",
-    "section": "Agenda (~60 min)",
-    "text": "Agenda (~60 min)\n\n\n\nTime\nActivity\n\n\n\n\n⏱️ 5′\n0. Check your setup\n\n\n⏱️ 10′\n1. Your first document (HTML + PDF)\n\n\n⏱️ 15′\n2. Prose + code + data\n\n\n⏱️ 10′\n3. The reproducible payoff (change the data)\n\n\n⏱️ 10′\n4. Slides from the same source\n\n\n⏱️ 10′\n5. Q&A & next steps\n\n\n\nDownload the sample data: data/data_kemiskinan_jateng.csv (from the workshop repo). Put it in your working folder under a data/ subfolder."
+    "objectID": "en/analisis.html#descriptive-statistics",
+    "href": "en/analisis.html#descriptive-statistics",
+    "title": "Data Analysis with Quarto",
+    "section": "1. Descriptive statistics",
+    "text": "1. Descriptive statistics\nSummaries of each variable: central tendency (mean, median) and spread (standard deviation, range).\n\nRPython\n\n\n\nvars &lt;- c(\"kemiskinan\", \"pdrb_kapita\", \"inflasi\", \"ipm\")\nringkas &lt;- data.frame(\n  Variable = vars,\n  Mean = sapply(df23[vars], mean), Median = sapply(df23[vars], median),\n  SD = sapply(df23[vars], sd),\n  Min = sapply(df23[vars], min), Max = sapply(df23[vars], max))\nkable(ringkas, digits = 2, row.names = FALSE)\n\n\n\n\nVariable\nMean\nMedian\nSD\nMin\nMax\n\n\n\n\nkemiskinan\n10.95\n10.64\n3.88\n4.65\n24.58\n\n\npdrb_kapita\n41.88\n41.05\n5.66\n31.63\n56.23\n\n\ninflasi\n2.69\n2.67\n0.46\n1.84\n3.52\n\n\nipm\n79.39\n79.17\n1.92\n76.20\n85.10\n\n\n\n\n\n\n\n\nimport pandas as pd\ndf = pd.read_csv(\"../data/data_kemiskinan_jateng.csv\")\ndf23 = df[df[\"tahun\"] == 2023]\ndf23[[\"kemiskinan\",\"pdrb_kapita\",\"inflasi\",\"ipm\"]].describe().round(2)\n\n       kemiskinan  pdrb_kapita  inflasi    ipm\ncount       35.00        35.00    35.00  35.00\nmean        10.95        41.88     2.69  79.39\nstd          3.88         5.66     0.46   1.92\nmin          4.65        31.63     1.84  76.20\n25%          8.24        38.80     2.35  77.87\n50%         10.64        41.05     2.67  79.17\n75%         12.50        46.02     3.10  80.84\nmax         24.58        56.23     3.52  85.10"
   },
   {
-    "objectID": "en/hands-on.html#check-your-setup-5",
-    "href": "en/hands-on.html#check-your-setup-5",
-    "title": "Hands-on: Quarto in 1 Hour",
-    "section": "⏱️ 0 · Check your setup (5′)",
-    "text": "⏱️ 0 · Check your setup (5′)\nCreate a new working folder, open it in RStudio, then in the Terminal:\nquarto check\nLook for (✓) for Quarto and LaTeX. (If using Python: also for Jupyter.)"
+    "objectID": "en/analisis.html#plotting",
+    "href": "en/analisis.html#plotting",
+    "title": "Data Analysis with Quarto",
+    "section": "2. Plotting",
+    "text": "2. Plotting\nVisualization reveals the distribution (histogram) and relationships (scatter).\n\nRPython\n\n\n\npar(mfrow = c(1, 2))\nhist(df23$kemiskinan, breaks = 10, col = \"#b03a2e\", border = \"white\",\n     main = \"\", xlab = \"Poverty (%)\", ylab = \"Count\")\nplot(df23$pdrb_kapita, df23$kemiskinan, pch = 19, col = \"#2166ac\",\n     xlab = \"GDP per capita\", ylab = \"Poverty (%)\")\nabline(lm(kemiskinan ~ pdrb_kapita, data = df23), col = \"#b03a2e\", lwd = 2)\n\n\n\n\nPoverty distribution (histogram) & its relation to GDP per capita, 2023\n\n\n\n\n\n\n\nimport numpy as np, matplotlib.pyplot as plt\nfig, ax = plt.subplots(1, 2, figsize=(8, 3.2))\nax[0].hist(df23[\"kemiskinan\"], bins=10, color=\"#b03a2e\", edgecolor=\"white\")\nax[0].set_xlabel(\"Poverty (%)\"); ax[0].set_ylabel(\"Count\")\nax[1].scatter(df23[\"pdrb_kapita\"], df23[\"kemiskinan\"], color=\"#2166ac\")\nm, b = np.polyfit(df23[\"pdrb_kapita\"], df23[\"kemiskinan\"], 1)\nax[1].plot(df23[\"pdrb_kapita\"], m*df23[\"pdrb_kapita\"] + b, color=\"#b03a2e\")\nax[1].set_xlabel(\"GDP per capita\"); ax[1].set_ylabel(\"Poverty (%)\")\nplt.tight_layout(); plt.show()\n\n\n\n\nPoverty distribution (histogram) & its relation to GDP per capita, 2023"
   },
   {
-    "objectID": "en/hands-on.html#your-first-document-10",
-    "href": "en/hands-on.html#your-first-document-10",
-    "title": "Hands-on: Quarto in 1 Hour",
-    "section": "⏱️ 1 · Your first document (10′)",
-    "text": "⏱️ 1 · Your first document (10′)\nCreate hello.qmd:\n---\ntitle: \"Hello Quarto\"\nformat: html\n---\n\n## Welcome\nA normal paragraph: **bold**, *italic*, `code`. A list:\n\n- one\n- two\nClick Render (or quarto render hello.qmd). Then change format: html → format: pdf and render again. Same source, two outputs. 🎉"
+    "objectID": "en/analisis.html#multiple-linear-regression",
+    "href": "en/analisis.html#multiple-linear-regression",
+    "title": "Data Analysis with Quarto",
+    "section": "3. Multiple linear regression",
+    "text": "3. Multiple linear regression\nModel poverty as a function of several predictors. Watch the sign of each coefficient (direction), the p-value (significance), and R² (explained variance). We use the 2019–2023 panel (175 observations).\n\nRPython\n\n\n\nmodel &lt;- lm(kemiskinan ~ pdrb_kapita + inflasi + ipm + pengangguran, data = df)\nkoef &lt;- summary(model)$coefficients[, c(\"Estimate\", \"Pr(&gt;|t|)\")]\nrownames(koef) &lt;- c(\"Intercept\",\"GDP per capita\",\"Inflation\",\"HDI\",\"Unemployment\")\nkable(koef, col.names = c(\"Coefficient\", \"p-value\"), digits = 3)\n\n\n\n\n\nCoefficient\np-value\n\n\n\n\nIntercept\n39.795\n0.002\n\n\nGDP per capita\n0.042\n0.471\n\n\nInflation\n0.004\n0.983\n\n\nHDI\n-0.408\n0.018\n\n\nUnemployment\n0.323\n0.076\n\n\n\n\ncat(sprintf(\"R-squared = %.3f\", summary(model)$r.squared))\n\nR-squared = 0.055\n\n\n\n\n\nimport statsmodels.formula.api as smf\nmodel = smf.ols(\"kemiskinan ~ pdrb_kapita + inflasi + ipm + pengangguran\", data=df).fit()\nkoef = pd.DataFrame({\"Coefficient\": model.params, \"p-value\": model.pvalues}).round(3)\nkoef.index = [\"Intercept\",\"GDP per capita\",\"Inflation\",\"HDI\",\"Unemployment\"]\nprint(koef)\n\n                Coefficient  p-value\nIntercept            39.795    0.002\nGDP per capita        0.042    0.471\nInflation             0.004    0.983\nHDI                  -0.408    0.018\nUnemployment          0.323    0.076\n\nprint(f\"R-squared = {model.rsquared:.3f}\")\n\nR-squared = 0.055\n\n\n\n\n\nReading it: a coefficient’s sign is the direction (e.g. a negative HDI coefficient ⇒ higher HDI, lower poverty); p-value &lt; 0.05 ⇒ significant; R² = share of variance explained. A low R² for this simple model is expected — panel data often needs fixed effects or spatial regression (see the book). That’s the point of being reproducible: swap the model, re-render, compare."
   },
   {
-    "objectID": "en/hands-on.html#prose-code-data-15",
-    "href": "en/hands-on.html#prose-code-data-15",
-    "title": "Hands-on: Quarto in 1 Hour",
-    "section": "⏱️ 2 · Prose + code + data (15′)",
-    "text": "⏱️ 2 · Prose + code + data (15′)\nThe heart of Quarto: code runs at render time and its results flow into the document. Create analysis.qmd (pick R or Python):\n\nRPython\n\n\n---\ntitle: \"Central Java Poverty\"\nformat: html\n---\n\n```{r}\nlibrary(dplyr); library(ggplot2)\ndf &lt;- read.csv(\"data/data_kemiskinan_jateng.csv\")\ndf23 &lt;- df[df$tahun == 2023, ]\n```\n\nMean poverty in 2023 = **`r round(mean(df23$kemiskinan), 2)`%**.\n\n```{r}\ndf |&gt; group_by(tahun) |&gt; summarise(rata = mean(kemiskinan)) |&gt;\n  ggplot(aes(tahun, rata)) + geom_line() + geom_point() +\n  labs(x = \"Year\", y = \"Poverty (%)\")\n```\n\n\n---\ntitle: \"Central Java Poverty\"\nformat: html\njupyter: python3\n---\n\n```{python}\nimport pandas as pd, matplotlib.pyplot as plt\ndf = pd.read_csv(\"data/data_kemiskinan_jateng.csv\")\ndf23 = df[df[\"tahun\"] == 2023]\nprint(f\"Mean 2023: {df23['kemiskinan'].mean():.2f}%\")\n```\n\n```{python}\ndf.groupby(\"tahun\")[\"kemiskinan\"].mean().plot(marker=\"o\")\nplt.xlabel(\"Year\"); plt.ylabel(\"Poverty (%)\"); plt.show()\n```\n\n\n\nRender. Notice: the inline number and the chart both come from the data — no copy-paste."
+    "objectID": "en/analisis.html#geostatistics",
+    "href": "en/analisis.html#geostatistics",
+    "title": "Data Analysis with Quarto",
+    "section": "4. Geostatistics",
+    "text": "4. Geostatistics\nSpatial data carries an extra message: do poor districts cluster? We map the distribution, then test for spatial autocorrelation with Moran’s I.\n\nChoropleth map\n\nRPython\n\n\n\nlibrary(sf); library(maptiles); library(tidyterra)\ngeo &lt;- st_transform(st_read(\"../data/jateng.geojson\", quiet = TRUE), 3857)\npeta &lt;- merge(geo, df23, by = \"wilayah\", all.x = TRUE)\nlatar &lt;- get_tiles(peta, provider = \"OpenStreetMap\", zoom = 8, crop = TRUE)\nggplot() + geom_spatraster_rgb(data = latar) +\n  geom_sf(data = peta, aes(fill = kemiskinan), color = \"white\", linewidth = 0.1, alpha = 0.85) +\n  scale_fill_distiller(palette = \"OrRd\", direction = 1, name = \"Poverty (%)\") + theme_void()\n\n\n\n\nPoverty by district, 2023 (R)\n\n\n\n\n\n\n\nimport geopandas as gpd, contextily as ctx\ng = gpd.read_file(\"../data/jateng.geojson\")\npmap = g.merge(df23, on=\"wilayah\", how=\"left\").to_crs(3857)\nax = pmap.plot(column=\"kemiskinan\", cmap=\"OrRd\", legend=True, alpha=0.85,\n               edgecolor=\"white\", linewidth=0.3, figsize=(8, 4.2))\nctx.add_basemap(ax, source=ctx.providers.OpenStreetMap.Mapnik)\nax.set_axis_off(); plt.show()\n\n\n\n\nPoverty by district, 2023 (Python)\n\n\n\n\n\n\n\n\n\nSpatial autocorrelation — Moran’s I\nA positive, significant Moran’s I ⇒ similar values sit next to each other (clustering).\n\nRPython\n\n\n\nlibrary(spdep)\nnb &lt;- poly2nb(peta)                 # neighbours (queen contiguity)\nw  &lt;- nb2listw(nb, style = \"W\")     # spatial weights\nmt &lt;- moran.test(peta$kemiskinan, w)\ncat(sprintf(\"Moran's I = %.3f (p = %.4f)\", mt$estimate[1], mt$p.value))\n\nMoran's I = 0.106 (p = 0.1194)\n\n\n\n\n\nfrom libpysal.weights import Queen\nfrom esda.moran import Moran\nw = Queen.from_dataframe(pmap, use_index=False); w.transform = \"r\"\nmi = Moran(pmap[\"kemiskinan\"].values, w)\nprint(f\"Moran's I = {mi.I:.3f} (p = {mi.p_sim:.4f})\")\n\nMoran's I = 0.106 (p = 0.1380)\n\n\n\n\n\nInterpretation: if Moran’s I is positive and significant, poverty clusters spatially — there are poverty “pockets.” Follow up with LISA (local clusters) and spatial regression if needed (see the book’s Spatial Statistics chapter)."
   },
   {
-    "objectID": "en/hands-on.html#sec-repro",
-    "href": "en/hands-on.html#sec-repro",
-    "title": "Hands-on: Quarto in 1 Hour",
-    "section": "⏱️ 3 · The reproducible payoff (10′)",
-    "text": "⏱️ 3 · The reproducible payoff (10′)\nThe “aha” moment:\n\nOpen data/data_kemiskinan_jateng.csv.\nChange Kota Semarang 2023 from 4.58 → 24.58. Save.\nRe-render analysis.qmd.\n\nThe mean and the chart change instantly. One data edit → the whole document follows.\n\n\n\n\n\n\nImportantMust know: quarto render, not just preview\n\n\n\nThe live preview (on localhost) does not watch data files. After editing data, run quarto render in the Terminal and open the result — or edit-and-save a .qmd to make the preview refresh. (This is the most common gotcha.)"
+    "objectID": "en/analisis.html#next-steps",
+    "href": "en/analisis.html#next-steps",
+    "title": "Data Analysis with Quarto",
+    "section": "Next steps",
+    "text": "Next steps\n\n📘 Book “Quarto untuk Skripsi” — classical assumption tests, panel data, LISA, spatial regression (Indonesian): https://firmanhadi21.github.io/thesis-with-quarto/\n🧪 Back to the hands-on tutorial."
   },
   {
-    "objectID": "en/hands-on.html#slides-from-the-same-source-10",
-    "href": "en/hands-on.html#slides-from-the-same-source-10",
-    "title": "Hands-on: Quarto in 1 Hour",
-    "section": "⏱️ 4 · Slides from the same source (10′)",
-    "text": "⏱️ 4 · Slides from the same source (10′)\nNo rewriting needed. Edit the header of analysis.qmd to add two slide formats:\n---\ntitle: \"Central Java Poverty\"\nformat:\n  revealjs: default     # HTML slides (screen/web)\n  beamer:               # PDF slides (projector)\n    aspectratio: 169\n---\nThen:\nquarto render analysis.qmd --to revealjs   # -&gt; analysis.html\nquarto render analysis.qmd --to beamer     # -&gt; analysis.pdf\nEach ## heading becomes a slide; your chart appears on a slide — still from the same data."
+    "objectID": "en/index.html",
+    "href": "en/index.html",
+    "title": "Quarto Workshop",
+    "section": "",
+    "text": "🌐 Versi Bahasa Indonesia: baca dalam Bahasa Indonesia\nWelcome! This workshop introduces Quarto — a scientific publishing system that unites prose + code + data in a single file and renders to PDF, HTML, Word, and slides from one source."
   },
   {
-    "objectID": "en/hands-on.html#done-next-steps-10",
-    "href": "en/hands-on.html#done-next-steps-10",
-    "title": "Hands-on: Quarto in 1 Hour",
-    "section": "⏱️ 5 · Done & next steps (10′)",
-    "text": "⏱️ 5 · Done & next steps (10′)\nYou just: wrote a document, ran analysis inside it, proved reproducibility, and made slides — all from one source.\nKeep going:\n\n📘 Book “Quarto untuk Skripsi” (complete, Chapter I–V, ready templates; Indonesian) — https://firmanhadi21.github.io/thesis-with-quarto/\n📦 Thesis templates (R & Python) + defense slides — in the book’s repo.\n📑 Quarto documentation — https://quarto.org/docs/guide/\n🔖 Citations via Zotero — https://quarto.org/docs/authoring/citations.html"
+    "objectID": "en/index.html#who-is-this-for",
+    "href": "en/index.html#who-is-this-for",
+    "title": "Quarto Workshop",
+    "section": "Who is this for?",
+    "text": "Who is this for?\n\n\n🎓 Students\nWriting a quantitative thesis/dissertation: data analysis, tables, figures, citations, and a campus-formatted PDF — without copy-pasting from SPSS/Excel into Word.\n\n\n🔬 Lecturers & Researchers\nProducing reproducible papers, reports, and presentations. Data changed? Just re-render — numbers, tables, figures, and slides update automatically."
+  },
+  {
+    "objectID": "en/index.html#the-problem-we-solve",
+    "href": "en/index.html#the-problem-we-solve",
+    "title": "Quarto Workshop",
+    "section": "The problem we solve",
+    "text": "The problem we solve\n\n\n\n\n\n\n\nThe old way (Word + SPSS/Excel)\nWith Quarto\n\n\n\n\nNumbers copied by hand → typos\nNumbers appear automatically from code\n\n\nTable/figure numbering breaks on insert\nNumbering & table of contents automatic\n\n\nRevising data = redo analysis + re-paste\nChange data → re-render once\n\n\nManual citations & bibliography\nAutomatic citations (e.g. APA), via Zotero\n\n\nSlides rebuilt separately\nSlides from the same data (Beamer/Reveal.js)"
+  },
+  {
+    "objectID": "en/index.html#the-core-idea",
+    "href": "en/index.html#the-core-idea",
+    "title": "Quarto Workshop",
+    "section": "The core idea",
+    "text": "The core idea\n  .qmd file   ──►  Quarto  ──►  PDF · HTML · Word · Slides\n (prose +         (run the      (clean, reproducible\n  code + data)     code, weave)   output)\nOne source, many outputs. Change one thing in the data, and everything updates. That’s reproducibility — and we’ll prove it live today."
+  },
+  {
+    "objectID": "en/index.html#get-started",
+    "href": "en/index.html#get-started",
+    "title": "Quarto Workshop",
+    "section": "Get started",
+    "text": "Get started\n\n👉 Follow the hands-on tutorial — step by step, do it yourself.\n📊 Data Analysis — descriptive statistics, plotting, linear regression, and geostatistics (live R & Python code).\n🖥️ Download the slides (PDF/Beamer)\n📘 Full book “Quarto untuk Skripsi” (Indonesian): https://firmanhadi21.github.io/thesis-with-quarto/\n\n\n\n\n\n\n\nTipWhat to install\n\n\n\nR + RStudio (RStudio ships with Quarto), TinyTeX for PDF, and optionally Python for the Python examples. Details in the tutorial."
   },
   {
     "objectID": "hands-on.html",
@@ -144,41 +165,104 @@
     "href": "index.html#mulai",
     "title": "Quarto Workshop",
     "section": "Mulai",
-    "text": "Mulai\n\n👉 Ikuti tutorial hands-on — langkah demi langkah, bisa langsung Anda praktikkan.\n🖥️ Unduh slide presentasi (PDF/Beamer)\n📘 Buku lengkap “Quarto untuk Skripsi”: https://firmanhadi21.github.io/thesis-with-quarto/\n\n\n\n\n\n\n\nTipYang perlu disiapkan\n\n\n\nR + RStudio (RStudio sudah membawa Quarto), TinyTeX untuk PDF, dan opsional Python untuk contoh berbahasa Python. Detail di tutorial."
+    "text": "Mulai\n\n👉 Ikuti tutorial hands-on — langkah demi langkah, bisa langsung Anda praktikkan.\n📊 Analisis Data — statistik deskriptif, plotting, regresi linear, dan geostatistik (kode R & Python yang berjalan).\n🖥️ Unduh slide presentasi (PDF/Beamer)\n📘 Buku lengkap “Quarto untuk Skripsi”: https://firmanhadi21.github.io/thesis-with-quarto/\n\n\n\n\n\n\n\nTipYang perlu disiapkan\n\n\n\nR + RStudio (RStudio sudah membawa Quarto), TinyTeX untuk PDF, dan opsional Python untuk contoh berbahasa Python. Detail di tutorial."
   },
   {
-    "objectID": "en/index.html",
-    "href": "en/index.html",
-    "title": "Quarto Workshop",
+    "objectID": "analisis.html",
+    "href": "analisis.html",
+    "title": "Analisis Data dengan Quarto",
     "section": "",
-    "text": "🌐 Versi Bahasa Indonesia: baca dalam Bahasa Indonesia\nWelcome! This workshop introduces Quarto — a scientific publishing system that unites prose + code + data in a single file and renders to PDF, HTML, Word, and slides from one source."
+    "text": "🌐 English version: read this in English\nHalaman ini menunjukkan analisis nyata — dijalankan langsung dari data — untuk R dan Python. Studi kasus: tingkat kemiskinan 35 kabupaten/kota di Jawa Tengah (data/data_kemiskinan_jateng.csv). Salin kodenya dan jalankan di komputer Anda.\nlibrary(dplyr); library(ggplot2); library(knitr)\ndf &lt;- read.csv(\"data/data_kemiskinan_jateng.csv\")\ndf23 &lt;- df[df$tahun == 2023, ]"
   },
   {
-    "objectID": "en/index.html#who-is-this-for",
-    "href": "en/index.html#who-is-this-for",
-    "title": "Quarto Workshop",
-    "section": "Who is this for?",
-    "text": "Who is this for?\n\n\n🎓 Students\nWriting a quantitative thesis/dissertation: data analysis, tables, figures, citations, and a campus-formatted PDF — without copy-pasting from SPSS/Excel into Word.\n\n\n🔬 Lecturers & Researchers\nProducing reproducible papers, reports, and presentations. Data changed? Just re-render — numbers, tables, figures, and slides update automatically."
+    "objectID": "analisis.html#statistik-deskriptif",
+    "href": "analisis.html#statistik-deskriptif",
+    "title": "Analisis Data dengan Quarto",
+    "section": "1. Statistik deskriptif",
+    "text": "1. Statistik deskriptif\nRingkasan sebaran variabel: pemusatan (rata-rata, median) dan keragaman (simpangan baku, rentang).\n\nRPython\n\n\n\nvars &lt;- c(\"kemiskinan\", \"pdrb_kapita\", \"inflasi\", \"ipm\")\nringkas &lt;- data.frame(\n  Variabel = vars,\n  Rerata = sapply(df23[vars], mean), Median = sapply(df23[vars], median),\n  SB = sapply(df23[vars], sd),\n  Min = sapply(df23[vars], min), Maks = sapply(df23[vars], max))\nkable(ringkas, digits = 2, row.names = FALSE)\n\n\n\n\nVariabel\nRerata\nMedian\nSB\nMin\nMaks\n\n\n\n\nkemiskinan\n10.95\n10.64\n3.88\n4.65\n24.58\n\n\npdrb_kapita\n41.88\n41.05\n5.66\n31.63\n56.23\n\n\ninflasi\n2.69\n2.67\n0.46\n1.84\n3.52\n\n\nipm\n79.39\n79.17\n1.92\n76.20\n85.10\n\n\n\n\n\n\n\n\nimport pandas as pd\ndf = pd.read_csv(\"data/data_kemiskinan_jateng.csv\")\ndf23 = df[df[\"tahun\"] == 2023]\ndf23[[\"kemiskinan\",\"pdrb_kapita\",\"inflasi\",\"ipm\"]].describe().round(2)\n\n       kemiskinan  pdrb_kapita  inflasi    ipm\ncount       35.00        35.00    35.00  35.00\nmean        10.95        41.88     2.69  79.39\nstd          3.88         5.66     0.46   1.92\nmin          4.65        31.63     1.84  76.20\n25%          8.24        38.80     2.35  77.87\n50%         10.64        41.05     2.67  79.17\n75%         12.50        46.02     3.10  80.84\nmax         24.58        56.23     3.52  85.10"
   },
   {
-    "objectID": "en/index.html#the-problem-we-solve",
-    "href": "en/index.html#the-problem-we-solve",
-    "title": "Quarto Workshop",
-    "section": "The problem we solve",
-    "text": "The problem we solve\n\n\n\n\n\n\n\nThe old way (Word + SPSS/Excel)\nWith Quarto\n\n\n\n\nNumbers copied by hand → typos\nNumbers appear automatically from code\n\n\nTable/figure numbering breaks on insert\nNumbering & table of contents automatic\n\n\nRevising data = redo analysis + re-paste\nChange data → re-render once\n\n\nManual citations & bibliography\nAutomatic citations (e.g. APA), via Zotero\n\n\nSlides rebuilt separately\nSlides from the same data (Beamer/Reveal.js)"
+    "objectID": "analisis.html#plotting",
+    "href": "analisis.html#plotting",
+    "title": "Analisis Data dengan Quarto",
+    "section": "2. Plotting",
+    "text": "2. Plotting\nVisualisasi membantu memahami sebaran (histogram) dan hubungan (diagram pencar).\n\nRPython\n\n\n\npar(mfrow = c(1, 2))\nhist(df23$kemiskinan, breaks = 10, col = \"#b03a2e\", border = \"white\",\n     main = \"\", xlab = \"Kemiskinan (%)\", ylab = \"Jumlah daerah\")\nplot(df23$pdrb_kapita, df23$kemiskinan, pch = 19, col = \"#2166ac\",\n     xlab = \"PDRB per kapita (juta)\", ylab = \"Kemiskinan (%)\")\nabline(lm(kemiskinan ~ pdrb_kapita, data = df23), col = \"#b03a2e\", lwd = 2)\n\n\n\n\nSebaran kemiskinan (histogram) & hubungannya dengan PDRB per kapita, 2023\n\n\n\n\n\n\n\nimport numpy as np, matplotlib.pyplot as plt\nfig, ax = plt.subplots(1, 2, figsize=(8, 3.2))\nax[0].hist(df23[\"kemiskinan\"], bins=10, color=\"#b03a2e\", edgecolor=\"white\")\nax[0].set_xlabel(\"Kemiskinan (%)\"); ax[0].set_ylabel(\"Jumlah daerah\")\nax[1].scatter(df23[\"pdrb_kapita\"], df23[\"kemiskinan\"], color=\"#2166ac\")\nm, b = np.polyfit(df23[\"pdrb_kapita\"], df23[\"kemiskinan\"], 1)\nax[1].plot(df23[\"pdrb_kapita\"], m*df23[\"pdrb_kapita\"] + b, color=\"#b03a2e\")\nax[1].set_xlabel(\"PDRB per kapita (juta)\"); ax[1].set_ylabel(\"Kemiskinan (%)\")\nplt.tight_layout(); plt.show()\n\n\n\n\nSebaran kemiskinan (histogram) & hubungannya dengan PDRB per kapita, 2023"
   },
   {
-    "objectID": "en/index.html#the-core-idea",
-    "href": "en/index.html#the-core-idea",
-    "title": "Quarto Workshop",
-    "section": "The core idea",
-    "text": "The core idea\n  .qmd file   ──►  Quarto  ──►  PDF · HTML · Word · Slides\n (prose +         (run the      (clean, reproducible\n  code + data)     code, weave)   output)\nOne source, many outputs. Change one thing in the data, and everything updates. That’s reproducibility — and we’ll prove it live today."
+    "objectID": "analisis.html#regresi-linear-berganda",
+    "href": "analisis.html#regresi-linear-berganda",
+    "title": "Analisis Data dengan Quarto",
+    "section": "3. Regresi linear berganda",
+    "text": "3. Regresi linear berganda\nMemodelkan kemiskinan sebagai fungsi beberapa variabel bebas. Perhatikan tanda koefisien (arah pengaruh), p-value (signifikansi), dan R² (daya jelas model). Pakai data panel 2019–2023 (175 observasi).\n\nRPython\n\n\n\nmodel &lt;- lm(kemiskinan ~ pdrb_kapita + inflasi + ipm + pengangguran, data = df)\nkoef &lt;- summary(model)$coefficients[, c(\"Estimate\", \"Pr(&gt;|t|)\")]\nrownames(koef) &lt;- c(\"Konstanta\",\"PDRB per kapita\",\"Inflasi\",\"IPM\",\"Pengangguran\")\nkable(koef, col.names = c(\"Koefisien\", \"p-value\"), digits = 3)\n\n\n\n\n\nKoefisien\np-value\n\n\n\n\nKonstanta\n39.795\n0.002\n\n\nPDRB per kapita\n0.042\n0.471\n\n\nInflasi\n0.004\n0.983\n\n\nIPM\n-0.408\n0.018\n\n\nPengangguran\n0.323\n0.076\n\n\n\n\ncat(sprintf(\"R-squared = %.3f\", summary(model)$r.squared))\n\nR-squared = 0.055\n\n\n\n\n\nimport statsmodels.formula.api as smf\nmodel = smf.ols(\"kemiskinan ~ pdrb_kapita + inflasi + ipm + pengangguran\", data=df).fit()\nkoef = pd.DataFrame({\"Koefisien\": model.params, \"p-value\": model.pvalues}).round(3)\nkoef.index = [\"Konstanta\",\"PDRB per kapita\",\"Inflasi\",\"IPM\",\"Pengangguran\"]\nprint(koef)\n\n                 Koefisien  p-value\nKonstanta           39.795    0.002\nPDRB per kapita      0.042    0.471\nInflasi              0.004    0.983\nIPM                 -0.408    0.018\nPengangguran         0.323    0.076\n\nprint(f\"R-squared = {model.rsquared:.3f}\")\n\nR-squared = 0.055\n\n\n\n\n\nMembaca hasil: tanda koefisien = arah pengaruh (mis. koefisien negatif pada IPM ⇒ makin tinggi IPM, makin rendah kemiskinan); p-value &lt; 0,05 ⇒ pengaruh signifikan; R² = proporsi variasi yang dijelaskan model. R² yang rendah pada model sederhana ini justru wajar — data panel sering butuh efek tetap (fixed effects) atau regresi spasial (lihat buku). Itulah gunanya reproducible: ganti model, render ulang, bandingkan."
   },
   {
-    "objectID": "en/index.html#get-started",
-    "href": "en/index.html#get-started",
-    "title": "Quarto Workshop",
-    "section": "Get started",
-    "text": "Get started\n\n👉 Follow the hands-on tutorial — step by step, do it yourself.\n🖥️ Download the slides (PDF/Beamer)\n📘 Full book “Quarto untuk Skripsi” (Indonesian): https://firmanhadi21.github.io/thesis-with-quarto/\n\n\n\n\n\n\n\nTipWhat to install\n\n\n\nR + RStudio (RStudio ships with Quarto), TinyTeX for PDF, and optionally Python for the Python examples. Details in the tutorial."
+    "objectID": "analisis.html#geostatistik",
+    "href": "analisis.html#geostatistik",
+    "title": "Analisis Data dengan Quarto",
+    "section": "4. Geostatistik",
+    "text": "4. Geostatistik\nData spasial punya pesan tambahan: apakah daerah miskin mengelompok? Kita petakan sebarannya, lalu uji autokorelasi spasial dengan Moran’s I.\n\nPeta tematik (choropleth)\n\nRPython\n\n\n\nlibrary(sf); library(maptiles); library(tidyterra)\ngeo &lt;- st_transform(st_read(\"data/jateng.geojson\", quiet = TRUE), 3857)\npeta &lt;- merge(geo, df23, by = \"wilayah\", all.x = TRUE)\nlatar &lt;- get_tiles(peta, provider = \"OpenStreetMap\", zoom = 8, crop = TRUE)\nggplot() + geom_spatraster_rgb(data = latar) +\n  geom_sf(data = peta, aes(fill = kemiskinan), color = \"white\", linewidth = 0.1, alpha = 0.85) +\n  scale_fill_distiller(palette = \"OrRd\", direction = 1, name = \"Kemiskinan (%)\") + theme_void()\n\n\n\n\nSebaran kemiskinan kabupaten/kota, 2023 (R)\n\n\n\n\n\n\n\nimport geopandas as gpd, contextily as ctx\ng = gpd.read_file(\"data/jateng.geojson\")\npmap = g.merge(df23, on=\"wilayah\", how=\"left\").to_crs(3857)\nax = pmap.plot(column=\"kemiskinan\", cmap=\"OrRd\", legend=True, alpha=0.85,\n               edgecolor=\"white\", linewidth=0.3, figsize=(8, 4.2))\nctx.add_basemap(ax, source=ctx.providers.OpenStreetMap.Mapnik)\nax.set_axis_off(); plt.show()\n\n\n\n\nSebaran kemiskinan kabupaten/kota, 2023 (Python)\n\n\n\n\n\n\n\n\n\nAutokorelasi spasial — Moran’s I\nMoran’s I positif & signifikan ⇒ daerah dengan nilai serupa berdekatan (mengelompok).\n\nRPython\n\n\n\nlibrary(spdep)\nnb &lt;- poly2nb(peta)                 # ketetanggaan (queen contiguity)\nw  &lt;- nb2listw(nb, style = \"W\")     # bobot spasial\nmt &lt;- moran.test(peta$kemiskinan, w)\ncat(sprintf(\"Moran's I = %.3f (p = %.4f)\", mt$estimate[1], mt$p.value))\n\nMoran's I = 0.106 (p = 0.1194)\n\n\n\n\n\nfrom libpysal.weights import Queen\nfrom esda.moran import Moran\nw = Queen.from_dataframe(pmap, use_index=False); w.transform = \"r\"\nmi = Moran(pmap[\"kemiskinan\"].values, w)\nprint(f\"Moran's I = {mi.I:.3f} (p = {mi.p_sim:.4f})\")\n\nMoran's I = 0.106 (p = 0.1210)\n\n\n\n\n\nTafsir: bila Moran’s I positif & signifikan, kemiskinan mengelompok secara spasial — ada “kantong” kemiskinan. Lanjutkan dengan LISA (klaster lokal) dan regresi spasial bila perlu (lihat buku, bab Statistik Spasial)."
+  },
+  {
+    "objectID": "analisis.html#selanjutnya",
+    "href": "analisis.html#selanjutnya",
+    "title": "Analisis Data dengan Quarto",
+    "section": "Selanjutnya",
+    "text": "Selanjutnya\n\n📘 Buku “Quarto untuk Skripsi” — uji asumsi klasik, data panel, LISA, regresi spasial: https://firmanhadi21.github.io/thesis-with-quarto/\n🧪 Kembali ke tutorial hands-on."
+  },
+  {
+    "objectID": "en/hands-on.html",
+    "href": "en/hands-on.html",
+    "title": "Hands-on: Quarto in 1 Hour",
+    "section": "",
+    "text": "🌐 Versi Bahasa Indonesia: baca dalam Bahasa Indonesia"
+  },
+  {
+    "objectID": "en/hands-on.html#agenda-60-min",
+    "href": "en/hands-on.html#agenda-60-min",
+    "title": "Hands-on: Quarto in 1 Hour",
+    "section": "Agenda (~60 min)",
+    "text": "Agenda (~60 min)\n\n\n\nTime\nActivity\n\n\n\n\n⏱️ 5′\n0. Check your setup\n\n\n⏱️ 10′\n1. Your first document (HTML + PDF)\n\n\n⏱️ 15′\n2. Prose + code + data\n\n\n⏱️ 10′\n3. The reproducible payoff (change the data)\n\n\n⏱️ 10′\n4. Slides from the same source\n\n\n⏱️ 10′\n5. Q&A & next steps\n\n\n\nDownload the sample data: data/data_kemiskinan_jateng.csv (from the workshop repo). Put it in your working folder under a data/ subfolder."
+  },
+  {
+    "objectID": "en/hands-on.html#check-your-setup-5",
+    "href": "en/hands-on.html#check-your-setup-5",
+    "title": "Hands-on: Quarto in 1 Hour",
+    "section": "⏱️ 0 · Check your setup (5′)",
+    "text": "⏱️ 0 · Check your setup (5′)\nCreate a new working folder, open it in RStudio, then in the Terminal:\nquarto check\nLook for (✓) for Quarto and LaTeX. (If using Python: also for Jupyter.)"
+  },
+  {
+    "objectID": "en/hands-on.html#your-first-document-10",
+    "href": "en/hands-on.html#your-first-document-10",
+    "title": "Hands-on: Quarto in 1 Hour",
+    "section": "⏱️ 1 · Your first document (10′)",
+    "text": "⏱️ 1 · Your first document (10′)\nCreate hello.qmd:\n---\ntitle: \"Hello Quarto\"\nformat: html\n---\n\n## Welcome\nA normal paragraph: **bold**, *italic*, `code`. A list:\n\n- one\n- two\nClick Render (or quarto render hello.qmd). Then change format: html → format: pdf and render again. Same source, two outputs. 🎉"
+  },
+  {
+    "objectID": "en/hands-on.html#prose-code-data-15",
+    "href": "en/hands-on.html#prose-code-data-15",
+    "title": "Hands-on: Quarto in 1 Hour",
+    "section": "⏱️ 2 · Prose + code + data (15′)",
+    "text": "⏱️ 2 · Prose + code + data (15′)\nThe heart of Quarto: code runs at render time and its results flow into the document. Create analysis.qmd (pick R or Python):\n\nRPython\n\n\n---\ntitle: \"Central Java Poverty\"\nformat: html\n---\n\n```{r}\nlibrary(dplyr); library(ggplot2)\ndf &lt;- read.csv(\"data/data_kemiskinan_jateng.csv\")\ndf23 &lt;- df[df$tahun == 2023, ]\n```\n\nMean poverty in 2023 = **`r round(mean(df23$kemiskinan), 2)`%**.\n\n```{r}\ndf |&gt; group_by(tahun) |&gt; summarise(rata = mean(kemiskinan)) |&gt;\n  ggplot(aes(tahun, rata)) + geom_line() + geom_point() +\n  labs(x = \"Year\", y = \"Poverty (%)\")\n```\n\n\n---\ntitle: \"Central Java Poverty\"\nformat: html\njupyter: python3\n---\n\n```{python}\nimport pandas as pd, matplotlib.pyplot as plt\ndf = pd.read_csv(\"data/data_kemiskinan_jateng.csv\")\ndf23 = df[df[\"tahun\"] == 2023]\nprint(f\"Mean 2023: {df23['kemiskinan'].mean():.2f}%\")\n```\n\n```{python}\ndf.groupby(\"tahun\")[\"kemiskinan\"].mean().plot(marker=\"o\")\nplt.xlabel(\"Year\"); plt.ylabel(\"Poverty (%)\"); plt.show()\n```\n\n\n\nRender. Notice: the inline number and the chart both come from the data — no copy-paste."
+  },
+  {
+    "objectID": "en/hands-on.html#sec-repro",
+    "href": "en/hands-on.html#sec-repro",
+    "title": "Hands-on: Quarto in 1 Hour",
+    "section": "⏱️ 3 · The reproducible payoff (10′)",
+    "text": "⏱️ 3 · The reproducible payoff (10′)\nThe “aha” moment:\n\nOpen data/data_kemiskinan_jateng.csv.\nChange Kota Semarang 2023 from 4.58 → 24.58. Save.\nRe-render analysis.qmd.\n\nThe mean and the chart change instantly. One data edit → the whole document follows.\n\n\n\n\n\n\nImportantMust know: quarto render, not just preview\n\n\n\nThe live preview (on localhost) does not watch data files. After editing data, run quarto render in the Terminal and open the result — or edit-and-save a .qmd to make the preview refresh. (This is the most common gotcha.)"
+  },
+  {
+    "objectID": "en/hands-on.html#slides-from-the-same-source-10",
+    "href": "en/hands-on.html#slides-from-the-same-source-10",
+    "title": "Hands-on: Quarto in 1 Hour",
+    "section": "⏱️ 4 · Slides from the same source (10′)",
+    "text": "⏱️ 4 · Slides from the same source (10′)\nNo rewriting needed. Edit the header of analysis.qmd to add two slide formats:\n---\ntitle: \"Central Java Poverty\"\nformat:\n  revealjs: default     # HTML slides (screen/web)\n  beamer:               # PDF slides (projector)\n    aspectratio: 169\n---\nThen:\nquarto render analysis.qmd --to revealjs   # -&gt; analysis.html\nquarto render analysis.qmd --to beamer     # -&gt; analysis.pdf\nEach ## heading becomes a slide; your chart appears on a slide — still from the same data."
+  },
+  {
+    "objectID": "en/hands-on.html#done-next-steps-10",
+    "href": "en/hands-on.html#done-next-steps-10",
+    "title": "Hands-on: Quarto in 1 Hour",
+    "section": "⏱️ 5 · Done & next steps (10′)",
+    "text": "⏱️ 5 · Done & next steps (10′)\nYou just: wrote a document, ran analysis inside it, proved reproducibility, and made slides — all from one source.\nKeep going:\n\n📘 Book “Quarto untuk Skripsi” (complete, Chapter I–V, ready templates; Indonesian) — https://firmanhadi21.github.io/thesis-with-quarto/\n📦 Thesis templates (R & Python) + defense slides — in the book’s repo.\n📑 Quarto documentation — https://quarto.org/docs/guide/\n🔖 Citations via Zotero — https://quarto.org/docs/authoring/citations.html"
   }
 ]
